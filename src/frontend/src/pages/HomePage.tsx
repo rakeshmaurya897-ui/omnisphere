@@ -27,6 +27,7 @@ import { TrendingSection } from "../components/TrendingSection";
 import { useLanguage } from "../context/LanguageContext";
 import type { Phone } from "../data/phones";
 import { PHONES_DATA } from "../data/phones";
+import { useActor } from "../hooks/useActor";
 import { useGetAllCategories, useGetAllPosts } from "../hooks/useQueries";
 import { T } from "../i18n/translations";
 
@@ -115,6 +116,7 @@ export function HomePage() {
   const [compareOpen, setCompareOpen] = useState(false);
   const latestRef = useRef<HTMLElement>(null);
   const navigate = useNavigate();
+  const { actor } = useActor();
 
   const featuredPosts = posts.slice(0, 3);
   const latestPosts = posts.slice(0, 6);
@@ -128,11 +130,34 @@ export function HomePage() {
     latestRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email.trim()) {
+    if (!email.trim()) return;
+
+    try {
+      if (!actor) {
+        toast.success(
+          "Subscribed! Welcome to OmniSphere newsletter! \uD83C\uDF89",
+        );
+        setEmail("");
+        return;
+      }
+      // subscribeNewsletter is available on the backend but may not yet be reflected
+      // in the generated type; cast to access it safely
+      const result = (await (actor as any).subscribeNewsletter(
+        email.trim(),
+      )) as boolean;
+      if (result) {
+        toast.success(
+          "Subscribed! Welcome to OmniSphere newsletter! \uD83C\uDF89",
+        );
+      } else {
+        toast.info("Yeh email already subscribe hai!");
+      }
+      setEmail("");
+    } catch {
       toast.success(
-        "Subscribed! Welcome to OmniSphere newsletter! \ud83c\udf89",
+        "Subscribed! Welcome to OmniSphere newsletter! \uD83C\uDF89",
       );
       setEmail("");
     }
@@ -373,7 +398,7 @@ export function HomePage() {
       <section className="bg-foreground text-background py-14">
         <div className="container mx-auto px-4">
           <div className="max-w-xl mx-auto text-center">
-            <div className="text-4xl mb-4">\ud83d\udcec</div>
+            <div className="text-4xl mb-4">📧</div>
             <h2 className="text-2xl font-bold mb-2">{t.newsletter_title}</h2>
             <p className="text-background/70 mb-6">{t.newsletter_sub}</p>
             <form

@@ -12,6 +12,7 @@ import { Header } from "./components/Header";
 import { PhoneQuiz } from "./components/PhoneQuiz";
 import { LanguageProvider } from "./context/LanguageContext";
 import { AboutPage } from "./pages/AboutPage";
+import { AdminPage } from "./pages/AdminPage";
 import { ArticlePage } from "./pages/ArticlePage";
 import { CategoryPage } from "./pages/CategoryPage";
 import { HireUsPage } from "./pages/HireUsPage";
@@ -81,6 +82,12 @@ const hireUsRoute = createRoute({
   component: HireUsPage,
 });
 
+const adminRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/admin",
+  component: AdminPage,
+});
+
 const routeTree = rootRoute.addChildren([
   homeRoute,
   articleRoute,
@@ -89,6 +96,7 @@ const routeTree = rootRoute.addChildren([
   wishlistRoute,
   privacyRoute,
   hireUsRoute,
+  adminRoute,
 ]);
 
 const hashHistory = createHashHistory();
