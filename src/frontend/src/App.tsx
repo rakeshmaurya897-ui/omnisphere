@@ -10,6 +10,7 @@ import {
 import { Footer } from "./components/Footer";
 import { Header } from "./components/Header";
 import { PhoneQuiz } from "./components/PhoneQuiz";
+import { ScrollToTop } from "./components/ScrollToTop";
 import { LanguageProvider } from "./context/LanguageContext";
 import { AboutPage } from "./pages/AboutPage";
 import { AdminPage } from "./pages/AdminPage";
@@ -25,6 +26,7 @@ function RootLayout() {
   return (
     <LanguageProvider>
       <div className="min-h-screen flex flex-col bg-background">
+        <ScrollToTop />
         <Header />
         <div className="flex-1">
           <Outlet />
