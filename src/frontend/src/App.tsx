@@ -14,7 +14,9 @@ import { LanguageProvider } from "./context/LanguageContext";
 import { AboutPage } from "./pages/AboutPage";
 import { ArticlePage } from "./pages/ArticlePage";
 import { CategoryPage } from "./pages/CategoryPage";
+import { HireUsPage } from "./pages/HireUsPage";
 import { HomePage } from "./pages/HomePage";
+import { PrivacyPolicyPage } from "./pages/PrivacyPolicyPage";
 import { WishlistPage } from "./pages/WishlistPage";
 
 // Root Layout
@@ -67,12 +69,26 @@ const wishlistRoute = createRoute({
   component: WishlistPage,
 });
 
+const privacyRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/privacy-policy",
+  component: PrivacyPolicyPage,
+});
+
+const hireUsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/hire-us",
+  component: HireUsPage,
+});
+
 const routeTree = rootRoute.addChildren([
   homeRoute,
   articleRoute,
   categoryRoute,
   aboutRoute,
   wishlistRoute,
+  privacyRoute,
+  hireUsRoute,
 ]);
 
 const hashHistory = createHashHistory();
