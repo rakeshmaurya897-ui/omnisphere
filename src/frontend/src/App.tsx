@@ -22,6 +22,11 @@ import { NotFoundPage } from "./pages/NotFoundPage";
 import { PrivacyPolicyPage } from "./pages/PrivacyPolicyPage";
 import { WishlistPage } from "./pages/WishlistPage";
 
+// Fix: If no hash is present (e.g. opening draft link directly), default to #/
+if (!window.location.hash || window.location.hash === "#") {
+  window.location.hash = "#/";
+}
+
 // Root Layout
 function RootLayout() {
   return (
