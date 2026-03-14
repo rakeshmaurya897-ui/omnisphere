@@ -9,6 +9,7 @@ import {
 } from "@tanstack/react-router";
 import { Footer } from "./components/Footer";
 import { Header } from "./components/Header";
+import OmniSphereChatbot from "./components/OmniSphereChatbot";
 import { PhoneQuiz } from "./components/PhoneQuiz";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { LanguageProvider } from "./context/LanguageContext";
@@ -43,6 +44,7 @@ function RootLayout() {
         <Footer />
         <Toaster position="bottom-right" />
         <PhoneQuiz />
+        <OmniSphereChatbot />
       </div>
     </LanguageProvider>
   );
