@@ -11,15 +11,32 @@ import {
 } from "@/components/ui/table";
 import { useActor } from "@/hooks/useActor";
 import { useQuery } from "@tanstack/react-query";
-import { Inbox, Loader2, Lock, Mail, RefreshCw, Users } from "lucide-react";
+import {
+  CheckCircle,
+  Inbox,
+  Key,
+  Loader2,
+  Lock,
+  Mail,
+  RefreshCw,
+  Users,
+} from "lucide-react";
 import { useState } from "react";
 
 const ADMIN_PASSWORD = "omnisphere@2026";
+const API_KEY_STORAGE = "omni_claude_api_key";
 
 export function AdminPage() {
   const [password, setPassword] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [error, setError] = useState("");
+
+  // API Key state
+  const [apiKey, setApiKey] = useState(
+    () => localStorage.getItem(API_KEY_STORAGE) || "",
+  );
+  const [apiKeyInput, setApiKeyInput] = useState("");
+  const [apiKeySaved, setApiKeySaved] = useState(false);
 
   const { actor, isFetching } = useActor();
 
@@ -47,6 +64,22 @@ export function AdminPage() {
     } else {
       setError("Galat password! Dobara try karo.");
     }
+  }
+
+  function handleSaveApiKey() {
+    const key = apiKeyInput.trim();
+    if (!key) return;
+    localStorage.setItem(API_KEY_STORAGE, key);
+    setApiKey(key);
+    setApiKeyInput("");
+    setApiKeySaved(true);
+    setTimeout(() => setApiKeySaved(false), 3000);
+  }
+
+  function handleRemoveApiKey() {
+    localStorage.removeItem(API_KEY_STORAGE);
+    setApiKey("");
+    setApiKeyInput("");
   }
 
   // --- Login Screen ---
@@ -264,6 +297,118 @@ export function AdminPage() {
               </Table>
             </div>
           )}
+
+          {/* ── Claude API Key Section ── */}
+          <div
+            className="mt-10 rounded-2xl border border-border bg-card p-6"
+            data-ocid="admin.apikey.panel"
+          >
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Key className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <h2 className="text-base font-bold text-foreground">
+                  Claude API Key
+                </h2>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  OmniBot chatbot ke liye key set karo
+                </p>
+              </div>
+              {apiKey && (
+                <Badge className="ml-auto bg-green-500/10 text-green-600 border-green-500/20 text-xs">
+                  ✓ Key saved
+                </Badge>
+              )}
+            </div>
+
+            {apiKey ? (
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50 border border-border">
+                  <Key className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                  <span className="text-sm font-mono text-muted-foreground flex-1 truncate">
+                    {apiKey.slice(0, 12)}••••••••••••••••••••••••••••••••
+                  </span>
+                </div>
+                <div className="flex gap-2">
+                  <Input
+                    type="password"
+                    placeholder="Nai key dalkar replace karo..."
+                    value={apiKeyInput}
+                    onChange={(e) => setApiKeyInput(e.target.value)}
+                    className="h-10 text-sm"
+                    data-ocid="admin.apikey.input"
+                  />
+                  <Button
+                    size="sm"
+                    onClick={handleSaveApiKey}
+                    disabled={!apiKeyInput.trim()}
+                    className="h-10 px-4 shrink-0"
+                    data-ocid="admin.apikey.save_button"
+                  >
+                    Update
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleRemoveApiKey}
+                    className="h-10 px-4 shrink-0 text-destructive hover:text-destructive border-destructive/30"
+                    data-ocid="admin.apikey.delete_button"
+                  >
+                    Remove
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-3">
+                <p className="text-sm text-muted-foreground">
+                  Apni Claude API key yahan paste karo. Key is device ke browser
+                  mein save hogi aur OmniBot automatically use karega.
+                </p>
+                <div className="flex gap-2">
+                  <Input
+                    type="password"
+                    placeholder="sk-ant-api03-..."
+                    value={apiKeyInput}
+                    onChange={(e) => setApiKeyInput(e.target.value)}
+                    className="h-11 font-mono text-sm"
+                    data-ocid="admin.apikey.input"
+                  />
+                  <Button
+                    onClick={handleSaveApiKey}
+                    disabled={!apiKeyInput.trim()}
+                    className="h-11 px-5 shrink-0"
+                    data-ocid="admin.apikey.save_button"
+                  >
+                    Save Key
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Key milti hai:{" "}
+                  <a
+                    href="https://console.anthropic.com"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-primary underline"
+                  >
+                    console.anthropic.com
+                  </a>
+                </p>
+              </div>
+            )}
+
+            {apiKeySaved && (
+              <div
+                className="flex items-center gap-2 mt-3 p-3 rounded-xl bg-green-500/10 border border-green-500/20"
+                data-ocid="admin.apikey.success_state"
+              >
+                <CheckCircle className="w-4 h-4 text-green-600" />
+                <span className="text-sm text-green-700 dark:text-green-400 font-medium">
+                  API key successfully save ho gayi! OmniBot ab kaam karega.
+                </span>
+              </div>
+            )}
+          </div>
         </div>
       </section>
     </main>

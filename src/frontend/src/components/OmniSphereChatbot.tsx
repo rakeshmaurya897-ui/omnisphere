@@ -49,6 +49,8 @@ const suggestedQuestions = [
   "Camera ke liye best phone?",
 ];
 
+const API_KEY_STORAGE = "omni_claude_api_key";
+
 export default function OmniSphereChatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
@@ -77,6 +79,22 @@ export default function OmniSphereChatbot() {
     const userMsg = text || input.trim();
     if (!userMsg || loading) return;
 
+    const apiKey = localStorage.getItem(API_KEY_STORAGE);
+    if (!apiKey) {
+      setMessages((prev) => [
+        ...prev,
+        { role: "user", content: userMsg },
+        {
+          role: "assistant",
+          content:
+            "⚙️ API key set nahi hai. Admin page par jaake Claude API key save karo, phir chatbot kaam karega. Admin: /admin",
+        },
+      ]);
+      setInput("");
+      setShowSuggestions(false);
+      return;
+    }
+
     setInput("");
     setShowSuggestions(false);
     const newMessages = [...messages, { role: "user", content: userMsg }];
@@ -86,7 +104,12 @@ export default function OmniSphereChatbot() {
     try {
       const response = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": apiKey,
+          "anthropic-version": "2023-06-01",
+          "anthropic-dangerous-request-allowlist": "allow-all",
+        },
         body: JSON.stringify({
           model: "claude-sonnet-4-20250514",
           max_tokens: 1000,
@@ -190,7 +213,6 @@ export default function OmniSphereChatbot() {
         @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
         .omni-chat * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'DM Sans', sans-serif; }
 
-        /* FAB pill button — same style as Find My Phone, just above it */
         .omni-fab {
           position: fixed;
           bottom: 152px;
@@ -219,7 +241,6 @@ export default function OmniSphereChatbot() {
           50% { box-shadow: 0 6px 24px rgba(255,107,53,0.45), 0 0 0 8px rgba(255,107,53,0); }
         }
 
-        /* Chat window — opens above the FAB pill */
         .omni-window {
           position: fixed;
           bottom: 220px;
