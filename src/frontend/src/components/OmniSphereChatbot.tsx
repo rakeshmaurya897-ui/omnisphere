@@ -1,3 +1,4 @@
+import { useActor } from "@/hooks/useActor";
 import { useEffect, useRef, useState } from "react";
 
 const SYSTEM_PROMPT = `Tu OmniSphere ka AI assistant hai — ek Hinglish tech blog jo phones aur gadgets ke baare mein hai (omnishpere.in).
@@ -49,9 +50,10 @@ const suggestedQuestions = [
   "Camera ke liye best phone?",
 ];
 
-const API_KEY_STORAGE = "omni_claude_api_key";
-
 export default function OmniSphereChatbot() {
+  const { actor, isFetching } = useActor();
+  const [apiKey, setApiKey] = useState("");
+
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     {
@@ -66,6 +68,19 @@ export default function OmniSphereChatbot() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
+  // Load API key from backend canister on mount
+  useEffect(() => {
+    if (!actor || isFetching) return;
+    (async () => {
+      try {
+        const key: string = await (actor as any).getClaudeApiKey();
+        if (key) setApiKey(key);
+      } catch {
+        // backend method may not exist yet
+      }
+    })();
+  }, [actor, isFetching]);
+
   // biome-ignore lint/correctness/useExhaustiveDependencies: scroll on message/loading change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -79,7 +94,6 @@ export default function OmniSphereChatbot() {
     const userMsg = text || input.trim();
     if (!userMsg || loading) return;
 
-    const apiKey = localStorage.getItem(API_KEY_STORAGE);
     if (!apiKey) {
       setMessages((prev) => [
         ...prev,
