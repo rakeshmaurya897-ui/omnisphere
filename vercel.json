@@ -1,8 +1,1 @@
-{
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ]
-}
+{\n  "version": 2,\n  "builds": [\n    {\n      "src": "frontend/package.json",\n      "use": "@vercel/static-build",\n      "config": {\n        "distDir": "frontend/out"\n      }\n    },\n    {\n      "src": "api/chat/*",\n      "use": "@vercel/node"\n    }\n  ],\n  "routes": [\n    {\n      "src": "/api/chat/(.*)",\n      "dest": "/api/chat/$1"\n    },\n    {\n      "src": "/(.*)",\n      "dest": "/frontend/out/$1"\n    }\n  ]\n}
