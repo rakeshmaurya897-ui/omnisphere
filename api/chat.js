@@ -24,41 +24,47 @@ export default async function handler(req, res) {
   }
 
   try {
+    const requestBody = {
+      contents: [
+        {
+          parts: [
+            {
+              text: `You are a helpful tech assistant for OmniSphere website. Answer in Hinglish (mixture of Hindi and English). Be friendly, concise, and helpful. User question: ${message}`,
+            },
+          ],
+        },
+      ],
+      generationConfig: {
+        temperature: 0.7,
+        maxOutputTokens: 500,
+      },
+    };
+
+    console.log("Sending request to Gemini API with message:", message);
+
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                {
-                  text: `You are a helpful tech assistant for OmniSphere website. Answer in Hinglish (mixture of Hindi and English). Be friendly, concise, and helpful. User question: ${message}`,
-                },
-              ],
-            },
-          ],
-          generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 500,
-          },
-        }),
+        body: JSON.stringify(requestBody),
       }
     );
 
-    // Check if response is ok
+    console.log("Gemini API response status:", response.status);
+
     if (!response.ok) {
       const errorData = await response.json();
       console.error("Gemini API error:", errorData);
       return res.status(500).json({ 
-        reply: "API service temporary unavailable 🔄 Dubara try karo" 
+        reply: `API Error: ${errorData?.error?.message || "Service unavailable"} 🔄 Dubara try karo` 
       });
     }
 
     const data = await response.json();
+    console.log("Gemini API response:", data);
 
     // Extract reply with better error handling
     const reply =
@@ -68,8 +74,9 @@ export default async function handler(req, res) {
     return res.status(200).json({ reply });
   } catch (error) {
     console.error("Chat API error:", error.message);
+    console.error("Full error:", error);
     return res.status(500).json({ 
-      reply: "❌ Kuch error aaya, thoda wait karke dubara try karo" 
+      reply: `Error: ${error.message}` 
     });
   }
 }
