@@ -1,90 +1,53 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from 'react';
+import { useChat } from 'react-use-chat';
+import './OmniSphereChatbot.css';
 
-export default function OmniSphereChatbot() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState([
-    {
-      role: "assistant",
-      content:
-        "Namaste! 👋 Main OmniSphere ka AI assistant hoon. Kuch bhi pucho 🚀",
-    },
-  ]);
-  const [input, setInput] = useState("");
+const OmniSphereChatbot = () => {
+  const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
-  const messagesEndRef = useRef(null);
+
+  const { sendMessage, receiveMessage, error } = useChat();
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    // Handle incoming messages
+    const handleReceive = (msg) => {
+      setMessages((prev) => [...prev, msg]);
+    };
 
-  const sendMessage = async () => {
-    if (!input.trim() || loading) return;
+    receiveMessage(handleReceive);
+  }, [receiveMessage]);
 
-    const userMsg = input;
-    setInput("");
-
-    const newMessages = [...messages, { role: "user", content: userMsg }];
-    setMessages(newMessages);
+  const handleSend = async (text) => {
     setLoading(true);
-
     try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ message: userMsg }),
-      });
-
-      const data = await res.json();
-
-      setMessages([
-        ...newMessages,
-        { role: "assistant", content: data.reply || "No response" },
-      ]);
+      const response = await sendMessage(text);
+      setMessages((prev) => [...prev, { text, sender: 'user' }, response]);
     } catch (err) {
-      setMessages([
-        ...newMessages,
-        { role: "assistant", content: "❌ Error aaya, dubara try karo" },
-      ]);
+      setMessages((prev) => [...prev, { text: 'Error: ' + err.message, sender: 'bot' }]);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={{ position: "fixed", bottom: 20, right: 20 }}>
-      <button onClick={() => setIsOpen(!isOpen)}>Chat</button>
-
-      {isOpen && (
-        <div
-          style={{
-            width: 300,
-            height: 400,
-            background: "#111",
-            color: "#fff",
-            padding: 10,
-            overflow: "auto",
-          }}
-        >
-          {messages.map((msg, i) => (
-            <div key={i}>
-              <b>{msg.role}:</b> {msg.content}
-            </div>
-          ))}
-
-          {loading && <div>Typing...</div>}
-
-          <div ref={messagesEndRef} />
-
-          <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            style={{ width: "80%" }}
-          />
-          <button onClick={sendMessage}>Send</button>
-        </div>
-      )}
+    <div className="chatbot-container">
+      <div className="gradient-header">
+        <h1>OmniSphere Chatbot</h1>
+      </div>
+      <div className="messages">
+        {messages.map((msg, index) => (
+          <div key={index} className={`message-bubble ${msg.sender}`}> 
+            {msg.text}
+            <span className="timestamp">{new Date().toLocaleTimeString()}</span>
+          </div>
+        ))}
+        {loading && <div className="loading-animation">Loading...</div>}
+      </div>
+      <div className="input-area">
+        <input type="text" onKeyPress={(e) => e.key === 'Enter' && handleSend(e.target.value)} />
+      </div>
     </div>
   );
-}
+};
+
+export default OmniSphereChatbot;
