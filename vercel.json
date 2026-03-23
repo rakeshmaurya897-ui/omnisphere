@@ -1,6 +1,7 @@
 {
+  "buildCommand": "cd src/frontend && pnpm install && pnpm run build",
+  "outputDirectory": "src/frontend/dist",
   "routes": [
-    { "handle": "filesystem" },
     { "src": "/api/(.*)", "dest": "/api/$1" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
