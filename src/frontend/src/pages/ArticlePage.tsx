@@ -220,8 +220,10 @@ export function ArticlePage() {
               </div>
             )}
 
-            {/* Mobile TOC (above article) */}
-            <TableOfContents content={post.content} />
+            {/* Mobile TOC (above article, mobile only) */}
+            <div className="md:hidden">
+              <TableOfContents content={post.content} />
+            </div>
 
             {/* Article Content with in-article ad */}
             <article
