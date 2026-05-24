@@ -3,10 +3,10 @@ import React, { useEffect, useState } from "react";
 export default function App() {
 
   const [products, setProducts] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const [search, setSearch] = useState("");
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedImage, setSelectedImage] = useState("");
   const [cart, setCart] = useState([]);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
 
@@ -14,84 +14,51 @@ export default function App() {
       .then((res) => res.json())
       .then((data) => {
 
-        const formatted = data.map((item, index) => {
+        const formatted = data.map((item, index) => ({
 
-          const wholesale =
-            parseInt(
-              item.price?.replace(/[₹,]/g, "")
-            ) || 0;
+          id: item.id || index,
 
-          const sellingPrice =
+          title: item.title || "Product",
+
+          description:
+            item.description ||
+            "Premium Product",
+
+          category:
+            item.category
+              ?.split(",")[0]
+              .trim() || "General",
+
+          image:
+            item.images?.[0] ||
+            "https://picsum.photos/500",
+
+          images:
+            item.images || [],
+
+          price:
             parseInt(
               item.sellingPrice?.replace(/[₹,]/g, "")
-            ) || wholesale;
+            ) || 0,
 
-          return {
+          originalPrice:
+            parseInt(
+              item.price?.replace(/[₹,]/g, "")
+            ) || 0,
 
-            id: item.id || index + 1,
+          productUrl:
+            item.productUrl || "#",
 
-            title:
-              item.title || "Product",
+          bestSeller:
+            index < 8
 
-            description:
-              item.description ||
-              "Premium Product",
-
-            category:
-              item.category ||
-              "General",
-
-            image:
-              item.imageUrl ||
-              `https://picsum.photos/seed/${index}/600/600`,
-
-            price: sellingPrice,
-
-            originalPrice: wholesale,
-
-            productUrl:
-              item.productUrl || "#",
-
-            bestSeller:
-              index < 8
-          };
-
-        });
+        }));
 
         setProducts(formatted);
 
       });
 
   }, []);
-
-  const categories = [
-    "All",
-    ...new Set(
-      products.map((p) =>
-        p.category.split(",")[0].trim()
-      )
-    )
-  ];
-
-  const filteredProducts =
-    products.filter((product) => {
-
-      const categoryMatch =
-        selectedCategory === "All"
-          ? true
-          : product.category.includes(selectedCategory);
-
-      const searchMatch =
-        product.title
-          .toLowerCase()
-          .includes(search.toLowerCase());
-
-      return categoryMatch && searchMatch;
-
-    });
-
-  const bestSellers =
-    products.filter((p) => p.bestSeller);
 
   const addToCart = (product) => {
     setCart([...cart, product]);
@@ -102,6 +69,26 @@ export default function App() {
       (sum, item) => sum + item.price,
       0
     );
+
+  const filteredProducts =
+    products.filter((p) =>
+      p.title
+        .toLowerCase()
+        .includes(search.toLowerCase())
+    );
+
+  const groupedProducts =
+    filteredProducts.reduce((acc, product) => {
+
+      if (!acc[product.category]) {
+        acc[product.category] = [];
+      }
+
+      acc[product.category].push(product);
+
+      return acc;
+
+    }, {});
 
   return (
 
@@ -120,7 +107,7 @@ export default function App() {
         style={{
           background:
           "linear-gradient(135deg,#0f172a,#1d4ed8,#7c3aed)",
-          padding:"60px 20px",
+          padding:"70px 25px",
           borderBottomLeftRadius:"40px",
           borderBottomRightRadius:"40px"
         }}
@@ -149,31 +136,32 @@ export default function App() {
                 fontWeight:"bold"
               }}
             >
-              🔥 Trending Store
+              🔥 Trending Ecommerce Store
             </div>
 
             <h1
               style={{
-                fontSize:"68px",
+                fontSize:"70px",
                 lineHeight:"1.1",
-                marginTop:"25px",
-                fontWeight:"bold"
+                marginTop:"25px"
               }}
             >
-              Upgrade Your Lifestyle
+              Discover Viral Products
             </h1>
 
             <p
               style={{
                 marginTop:"25px",
+                color:"#dbeafe",
                 fontSize:"20px",
-                lineHeight:"1.8",
-                color:"#dbeafe"
+                lineHeight:"1.8"
               }}
             >
-              Trending gadgets, premium decor,
-              smart accessories and viral products
-              with Free Shipping & Cash On Delivery.
+              Explore trending gadgets,
+              home decor, gifts, lamps,
+              toys and premium lifestyle
+              products with modern shopping
+              experience.
             </p>
 
             <div
@@ -215,64 +203,20 @@ export default function App() {
 
             </div>
 
-            <div
-              style={{
-                display:"flex",
-                gap:"12px",
-                marginTop:"35px",
-                flexWrap:"wrap"
-              }}
-            >
-
-              <div
-                style={{
-                  background:"#16a34a",
-                  padding:"12px 20px",
-                  borderRadius:"999px",
-                  fontWeight:"bold"
-                }}
-              >
-                🚚 Free Shipping
-              </div>
-
-              <div
-                style={{
-                  background:"#2563eb",
-                  padding:"12px 20px",
-                  borderRadius:"999px",
-                  fontWeight:"bold"
-                }}
-              >
-                💳 PhonePe Available
-              </div>
-
-              <div
-                style={{
-                  background:"#dc2626",
-                  padding:"12px 20px",
-                  borderRadius:"999px",
-                  fontWeight:"bold"
-                }}
-              >
-                💵 Cash On Delivery
-              </div>
-
-            </div>
-
           </div>
 
           <div>
 
             <img
               src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1200&auto=format&fit=crop"
-              alt="Hero"
+              alt=""
               style={{
                 width:"100%",
                 height:"550px",
                 objectFit:"cover",
                 borderRadius:"35px",
                 boxShadow:
-                "0 20px 60px rgba(0,0,0,0.4)"
+                "0 20px 60px rgba(0,0,0,0.5)"
               }}
             />
 
@@ -303,47 +247,7 @@ export default function App() {
 
       </div>
 
-      {/* CATEGORY */}
-
-      <div
-        style={{
-          display:"flex",
-          gap:"12px",
-          overflowX:"auto",
-          padding:"0 25px 25px"
-        }}
-      >
-
-        {categories.map((cat)=>(
-
-          <button
-            key={cat}
-            onClick={()=>
-              setSelectedCategory(cat)
-            }
-            style={{
-              background:
-              selectedCategory===cat
-              ? "#2563eb"
-              : "#111827",
-
-              color:"#fff",
-              border:"none",
-              padding:"12px 22px",
-              borderRadius:"999px",
-              cursor:"pointer",
-              whiteSpace:"nowrap",
-              fontWeight:"bold"
-            }}
-          >
-            {cat}
-          </button>
-
-        ))}
-
-      </div>
-
-      {/* BEST SELLER */}
+      {/* BEST SELLERS */}
 
       <div style={{padding:"0 25px"}}>
 
@@ -365,17 +269,20 @@ export default function App() {
           }}
         >
 
-          {bestSellers.map((product)=>(
+          {products
+            .filter((p)=>p.bestSeller)
+            .map((product)=>(
 
             <div
               key={product.id}
-              onClick={()=>
-                setSelectedProduct(product)
-              }
+              onClick={()=>{
+                setSelectedProduct(product);
+                setSelectedImage(product.image);
+              }}
               style={{
                 minWidth:"280px",
                 background:"#111827",
-                borderRadius:"28px",
+                borderRadius:"25px",
                 overflow:"hidden",
                 cursor:"pointer"
               }}
@@ -383,7 +290,7 @@ export default function App() {
 
               <img
                 src={product.image}
-                alt={product.title}
+                alt=""
                 style={{
                   width:"100%",
                   height:"260px",
@@ -395,8 +302,8 @@ export default function App() {
 
                 <h3
                   style={{
-                    lineHeight:"1.5",
-                    minHeight:"70px"
+                    minHeight:"65px",
+                    lineHeight:"1.5"
                   }}
                 >
                   {product.title}
@@ -405,17 +312,13 @@ export default function App() {
                 <div
                   style={{
                     display:"flex",
-                    gap:"10px",
                     alignItems:"center",
-                    marginTop:"10px"
+                    gap:"10px",
+                    marginTop:"12px"
                   }}
                 >
 
-                  <h2
-                    style={{
-                      color:"#22c55e"
-                    }}
-                  >
+                  <h2 style={{color:"#22c55e"}}>
                     ₹{product.price}
                   </h2>
 
@@ -440,154 +343,178 @@ export default function App() {
 
       </div>
 
-      {/* PRODUCTS */}
+      {/* CATEGORY PRODUCTS */}
 
-      <div
-        style={{
-          padding:"25px",
-          display:"grid",
-          gridTemplateColumns:
-          "repeat(auto-fit,minmax(280px,1fr))",
-          gap:"25px"
-        }}
-      >
+      <div style={{padding:"25px"}}>
 
-        {filteredProducts.map((product)=>(
+        {Object.entries(groupedProducts).map(
+          ([category, items]) => (
 
           <div
-            key={product.id}
-            onClick={()=>
-              setSelectedProduct(product)
-            }
-            style={{
-              background:"#111827",
-              borderRadius:"30px",
-              overflow:"hidden",
-              cursor:"pointer",
-              boxShadow:
-              "0 10px 30px rgba(0,0,0,0.4)"
-            }}
+            key={category}
+            style={{marginBottom:"60px"}}
           >
 
-            <img
-              src={product.image}
-              alt={product.title}
+            <h2
               style={{
-                width:"100%",
-                height:"280px",
-                objectFit:"cover"
+                fontSize:"42px",
+                marginBottom:"25px"
               }}
-            />
+            >
+              {category}
+            </h2>
 
-            <div style={{padding:"20px"}}>
+            <div
+              style={{
+                display:"grid",
+                gridTemplateColumns:
+                "repeat(auto-fit,minmax(280px,1fr))",
+                gap:"25px"
+              }}
+            >
 
-              <p
-                style={{
-                  color:"#60a5fa",
-                  fontWeight:"bold",
-                  fontSize:"14px"
-                }}
-              >
-                {product.category}
-              </p>
+              {items.map((product)=>(
 
-              <h3
-                style={{
-                  marginTop:"10px",
-                  lineHeight:"1.5",
-                  minHeight:"70px"
-                }}
-              >
-                {product.title}
-              </h3>
-
-              <p
-                style={{
-                  color:"#cbd5e1",
-                  fontSize:"14px",
-                  lineHeight:"1.7",
-                  minHeight:"65px"
-                }}
-              >
-                {product.description
-                  ?.slice(0,100)}...
-              </p>
-
-              <div
-                style={{
-                  display:"flex",
-                  alignItems:"center",
-                  gap:"10px",
-                  marginTop:"15px"
-                }}
-              >
-
-                <h2
-                  style={{
-                    color:"#22c55e"
-                  }}
-                >
-                  ₹{product.price}
-                </h2>
-
-                <span
-                  style={{
-                    textDecoration:"line-through",
-                    color:"#94a3b8"
-                  }}
-                >
-                  ₹{product.originalPrice}
-                </span>
-
-              </div>
-
-              <div
-                style={{
-                  display:"flex",
-                  gap:"10px",
-                  marginTop:"18px"
-                }}
-              >
-
-                <button
-                  onClick={(e)=>{
-                    e.stopPropagation();
-                    addToCart(product);
+                <div
+                  key={product.id}
+                  onClick={()=>{
+                    setSelectedProduct(product);
+                    setSelectedImage(product.image);
                   }}
                   style={{
-                    flex:1,
-                    background:"#2563eb",
-                    color:"#fff",
-                    border:"none",
-                    padding:"14px",
-                    borderRadius:"14px",
-                    fontWeight:"bold"
+                    background:"#111827",
+                    borderRadius:"30px",
+                    overflow:"hidden",
+                    cursor:"pointer",
+                    boxShadow:
+                    "0 10px 30px rgba(0,0,0,0.5)"
                   }}
                 >
-                  Add To Cart
-                </button>
 
-                <a
-                  href={`https://wa.me/919235727927?text=I want to order ${product.title}`}
-                  target="_blank"
-                  onClick={(e)=>
-                    e.stopPropagation()
-                  }
-                  style={{
-                    flex:1,
-                    background:"#22c55e",
-                    color:"#fff",
-                    textAlign:"center",
-                    padding:"14px",
-                    borderRadius:"14px",
-                    textDecoration:"none",
-                    fontWeight:"bold"
-                  }}
-                >
-                  WhatsApp
-                </a>
+                  <img
+                    src={product.image}
+                    alt=""
+                    style={{
+                      width:"100%",
+                      height:"300px",
+                      objectFit:"cover"
+                    }}
+                  />
 
-              </div>
+                  <div style={{padding:"20px"}}>
+
+                    <p
+                      style={{
+                        color:"#60a5fa",
+                        fontWeight:"bold"
+                      }}
+                    >
+                      {product.category}
+                    </p>
+
+                    <h3
+                      style={{
+                        marginTop:"10px",
+                        lineHeight:"1.5",
+                        minHeight:"75px"
+                      }}
+                    >
+                      {product.title}
+                    </h3>
+
+                    <p
+                      style={{
+                        color:"#cbd5e1",
+                        marginTop:"12px",
+                        lineHeight:"1.7",
+                        minHeight:"70px"
+                      }}
+                    >
+                      {product.description
+                        ?.slice(0,100)}...
+                    </p>
+
+                    <div
+                      style={{
+                        display:"flex",
+                        alignItems:"center",
+                        gap:"10px",
+                        marginTop:"15px"
+                      }}
+                    >
+
+                      <h2
+                        style={{
+                          color:"#22c55e"
+                        }}
+                      >
+                        ₹{product.price}
+                      </h2>
+
+                      <span
+                        style={{
+                          textDecoration:"line-through",
+                          color:"#94a3b8"
+                        }}
+                      >
+                        ₹{product.originalPrice}
+                      </span>
+
+                    </div>
+
+                    <div
+                      style={{
+                        display:"flex",
+                        gap:"10px",
+                        marginTop:"18px"
+                      }}
+                    >
+
+                      <button
+                        onClick={(e)=>{
+                          e.stopPropagation();
+                          addToCart(product);
+                        }}
+                        style={{
+                          flex:1,
+                          background:"#2563eb",
+                          color:"#fff",
+                          border:"none",
+                          padding:"14px",
+                          borderRadius:"14px",
+                          fontWeight:"bold"
+                        }}
+                      >
+                        Add To Cart
+                      </button>
+
+                      <a
+                        href={`https://wa.me/919235727927?text=I want to order ${product.title}`}
+                        target="_blank"
+                        onClick={(e)=>
+                          e.stopPropagation()
+                        }
+                        style={{
+                          flex:1,
+                          background:"#22c55e",
+                          color:"#fff",
+                          textAlign:"center",
+                          padding:"14px",
+                          borderRadius:"14px",
+                          textDecoration:"none",
+                          fontWeight:"bold"
+                        }}
+                      >
+                        WhatsApp
+                      </a>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+              ))}
 
             </div>
 
@@ -608,7 +535,7 @@ export default function App() {
           style={{
             position:"fixed",
             inset:"0",
-            background:"rgba(0,0,0,0.8)",
+            background:"rgba(0,0,0,0.85)",
             display:"flex",
             justifyContent:"center",
             alignItems:"center",
@@ -623,22 +550,66 @@ export default function App() {
             }
             style={{
               background:"#111827",
-              maxWidth:"750px",
+              maxWidth:"1100px",
               width:"100%",
               borderRadius:"30px",
-              overflow:"hidden"
+              overflow:"hidden",
+              display:"grid",
+              gridTemplateColumns:
+              "repeat(auto-fit,minmax(350px,1fr))"
             }}
           >
 
-            <img
-              src={selectedProduct.image}
-              alt={selectedProduct.title}
-              style={{
-                width:"100%",
-                height:"450px",
-                objectFit:"cover"
-              }}
-            />
+            <div style={{padding:"20px"}}>
+
+              <img
+                src={selectedImage}
+                alt=""
+                style={{
+                  width:"100%",
+                  height:"500px",
+                  objectFit:"cover",
+                  borderRadius:"20px"
+                }}
+              />
+
+              <div
+                style={{
+                  display:"flex",
+                  gap:"10px",
+                  overflowX:"auto",
+                  marginTop:"15px"
+                }}
+              >
+
+                {selectedProduct.images?.map(
+                  (img,index)=>(
+
+                  <img
+                    key={index}
+                    src={img}
+                    alt=""
+                    onClick={()=>
+                      setSelectedImage(img)
+                    }
+                    style={{
+                      width:"80px",
+                      height:"80px",
+                      objectFit:"cover",
+                      borderRadius:"12px",
+                      cursor:"pointer",
+                      border:
+                      selectedImage===img
+                      ? "3px solid #2563eb"
+                      : "2px solid #334155"
+                    }}
+                  />
+
+                ))}
+
+              </div>
+
+            </div>
 
             <div style={{padding:"30px"}}>
 
@@ -651,24 +622,15 @@ export default function App() {
                 {selectedProduct.category}
               </p>
 
-              <h2
+              <h1
                 style={{
                   fontSize:"42px",
-                  marginTop:"10px"
+                  marginTop:"12px",
+                  lineHeight:"1.3"
                 }}
               >
                 {selectedProduct.title}
-              </h2>
-
-              <p
-                style={{
-                  marginTop:"20px",
-                  color:"#cbd5e1",
-                  lineHeight:"1.8"
-                }}
-              >
-                {selectedProduct.description}
-              </p>
+              </h1>
 
               <div
                 style={{
@@ -679,11 +641,7 @@ export default function App() {
                 }}
               >
 
-                <h1
-                  style={{
-                    color:"#22c55e"
-                  }}
-                >
+                <h1 style={{color:"#22c55e"}}>
                   ₹{selectedProduct.price}
                 </h1>
 
@@ -691,7 +649,7 @@ export default function App() {
                   style={{
                     textDecoration:"line-through",
                     color:"#94a3b8",
-                    fontSize:"22px"
+                    fontSize:"24px"
                   }}
                 >
                   ₹{selectedProduct.originalPrice}
@@ -699,11 +657,22 @@ export default function App() {
 
               </div>
 
+              <p
+                style={{
+                  marginTop:"25px",
+                  lineHeight:"1.9",
+                  color:"#cbd5e1"
+                }}
+              >
+                {selectedProduct.description}
+              </p>
+
               <div
                 style={{
                   display:"flex",
                   gap:"15px",
-                  marginTop:"25px"
+                  marginTop:"30px",
+                  flexWrap:"wrap"
                 }}
               >
 
@@ -714,8 +683,8 @@ export default function App() {
                   style={{
                     flex:1,
                     background:"#2563eb",
-                    border:"none",
                     color:"#fff",
+                    border:"none",
                     padding:"18px",
                     borderRadius:"18px",
                     fontWeight:"bold",
@@ -725,25 +694,41 @@ export default function App() {
                   Add To Cart
                 </button>
 
-                <a
-                  href={`https://wa.me/919235727927?text=I want to order ${selectedProduct.title}`}
-                  target="_blank"
+                <button
                   style={{
                     flex:1,
-                    background:"#22c55e",
+                    background:"#6739B7",
                     color:"#fff",
-                    textAlign:"center",
+                    border:"none",
                     padding:"18px",
                     borderRadius:"18px",
-                    textDecoration:"none",
                     fontWeight:"bold",
                     fontSize:"18px"
                   }}
                 >
-                  Buy On WhatsApp
-                </a>
+                  Pay With PhonePe
+                </button>
 
               </div>
+
+              <a
+                href={`https://wa.me/919235727927?text=I want to order ${selectedProduct.title}`}
+                target="_blank"
+                style={{
+                  display:"block",
+                  marginTop:"18px",
+                  background:"#22c55e",
+                  color:"#fff",
+                  textAlign:"center",
+                  padding:"18px",
+                  borderRadius:"18px",
+                  textDecoration:"none",
+                  fontWeight:"bold",
+                  fontSize:"18px"
+                }}
+              >
+                Buy On WhatsApp
+              </a>
 
             </div>
 
@@ -792,7 +777,7 @@ export default function App() {
             fontSize:"18px"
           }}
         >
-          Pay With PhonePe
+          Checkout
         </button>
 
       </div>
@@ -801,4 +786,4 @@ export default function App() {
 
   );
 
-            }
+                              }
