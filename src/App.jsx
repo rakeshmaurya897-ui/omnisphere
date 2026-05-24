@@ -11,69 +11,114 @@ export default function App() {
   useEffect(() => {
 
     fetch("/products.json")
-      .then((res) => res.json())
+
+      .then((res) => {
+
+        if (!res.ok) {
+          throw new Error("products.json not found");
+        }
+
+        return res.json();
+
+      })
+
       .then((data) => {
 
-        const formatted = data.map((item, index) => ({
+        console.log("RAW JSON:", data);
 
-          id: item.id || index,
+        const safeData =
+          Array.isArray(data)
+          ? data
+          : [];
 
-          title:
-            item.title || "Product",
+        const formatted =
+          safeData
+          .filter(item => item && item.title)
+          .map((item, index) => {
 
-          description:
-            item.description ||
-            "Premium Product",
-
-          category:
-            item.category
-              ?.split(",")[0]
-              .trim() || "General",
-
-          image:
-            (
+            const imageArray =
               Array.isArray(item.images)
-              ? item.images[0]
-              : item.imageUrl
-            ) ||
-            "https://picsum.photos/500",
+              ? item.images
+              : [];
 
-          images:
-            Array.isArray(item.images)
-            ? item.images
-            : [item.imageUrl],
+            return {
 
-          price:
-            Number(
-              String(item.sellingPrice || "")
-              .replace(/[^\d.]/g,"")
-            ) || 0,
+              id:
+                item.id || index,
 
-          originalPrice:
-            Number(
-              String(item.price || "")
-              .replace(/[^\d.]/g,"")
-            ) || 0,
+              title:
+                String(
+                  item.title || "Product"
+                ),
 
-          productUrl:
-            item.productUrl || "#",
+              description:
+                String(
+                  item.description ||
+                  "Premium Product"
+                ),
 
-          bestSeller:
-            index < 8
+              category:
+                String(
+                  item.category || "General"
+                ),
 
-        }));
+              image:
+                imageArray[0]
+                ||
+                item.imageUrl
+                ||
+                "https://picsum.photos/500",
+
+              images:
+                imageArray.length > 0
+                ? imageArray
+                : [
+                    item.imageUrl ||
+                    "https://picsum.photos/500"
+                  ],
+
+              price:
+                Number(
+                  String(
+                    item.sellingPrice || 0
+                  ).replace(/[^\d.]/g,"")
+                ),
+
+              originalPrice:
+                Number(
+                  String(
+                    item.price || 0
+                  ).replace(/[^\d.]/g,"")
+                ),
+
+              productUrl:
+                item.productUrl || "#",
+
+              bestSeller:
+                index < 8
+
+            };
+
+          });
+
+        console.log("FORMATTED:", formatted);
 
         setProducts(formatted);
 
       })
-      .catch((err)=>{
-        console.log(err);
+
+      .catch((err) => {
+
+        console.log("JSON ERROR:", err);
+
       });
 
   }, []);
 
   const addToCart = (product) => {
+
     setCart([...cart, product]);
+
   };
 
   const total =
@@ -93,7 +138,9 @@ export default function App() {
     filteredProducts.reduce((acc, product)=>{
 
       if(!acc[product.category]){
+
         acc[product.category] = [];
+
       }
 
       acc[product.category].push(product);
@@ -170,10 +217,9 @@ export default function App() {
               }}
             >
               Explore trending gadgets,
-              home decor, gifts, lamps,
-              toys and premium lifestyle
-              products with modern shopping
-              experience.
+              home decor, gifts,
+              lamps, toys and premium
+              lifestyle products.
             </p>
 
           </div>
@@ -218,9 +264,21 @@ export default function App() {
 
       </div>
 
-      {/* BEST SELLERS */}
+      {/* DEBUG */}
 
       <div style={{padding:"0 25px"}}>
+
+        <p>
+          Products Loaded:
+          {" "}
+          {products.length}
+        </p>
+
+      </div>
+
+      {/* BEST SELLERS */}
+
+      <div style={{padding:"25px"}}>
 
         <h2
           style={{
@@ -235,8 +293,7 @@ export default function App() {
           style={{
             display:"flex",
             gap:"20px",
-            overflowX:"auto",
-            paddingBottom:"20px"
+            overflowX:"auto"
           }}
         >
 
@@ -271,38 +328,18 @@ export default function App() {
 
               <div style={{padding:"18px"}}>
 
-                <h3
-                  style={{
-                    minHeight:"65px",
-                    lineHeight:"1.5"
-                  }}
-                >
+                <h3>
                   {product.title}
                 </h3>
 
-                <div
+                <h2
                   style={{
-                    display:"flex",
-                    alignItems:"center",
-                    gap:"10px",
-                    marginTop:"12px"
+                    color:"#22c55e",
+                    marginTop:"15px"
                   }}
                 >
-
-                  <h2 style={{color:"#22c55e"}}>
-                    ₹{product.price}
-                  </h2>
-
-                  <span
-                    style={{
-                      textDecoration:"line-through",
-                      color:"#94a3b8"
-                    }}
-                  >
-                    ₹{product.originalPrice}
-                  </span>
-
-                </div>
+                  ₹{product.price}
+                </h2>
 
               </div>
 
@@ -374,8 +411,7 @@ export default function App() {
 
                     <p
                       style={{
-                        color:"#60a5fa",
-                        fontWeight:"bold"
+                        color:"#60a5fa"
                       }}
                     >
                       {product.category}
@@ -392,42 +428,22 @@ export default function App() {
 
                     <p
                       style={{
-                        color:"#cbd5e1",
                         marginTop:"12px",
-                        lineHeight:"1.7"
+                        color:"#cbd5e1"
                       }}
                     >
                       {product.description
-                        ?.slice(0,100)}...
+                        ?.slice(0,100)}
                     </p>
 
-                    <div
+                    <h2
                       style={{
-                        display:"flex",
-                        alignItems:"center",
-                        gap:"10px",
-                        marginTop:"15px"
+                        marginTop:"15px",
+                        color:"#22c55e"
                       }}
                     >
-
-                      <h2
-                        style={{
-                          color:"#22c55e"
-                        }}
-                      >
-                        ₹{product.price}
-                      </h2>
-
-                      <span
-                        style={{
-                          textDecoration:"line-through",
-                          color:"#94a3b8"
-                        }}
-                      >
-                        ₹{product.originalPrice}
-                      </span>
-
-                    </div>
+                      ₹{product.price}
+                    </h2>
 
                     <div
                       style={{
@@ -448,8 +464,7 @@ export default function App() {
                           color:"#fff",
                           border:"none",
                           padding:"14px",
-                          borderRadius:"14px",
-                          fontWeight:"bold"
+                          borderRadius:"14px"
                         }}
                       >
                         Add To Cart
@@ -459,9 +474,6 @@ export default function App() {
                         href={`https://wa.me/919235727927?text=I want to order ${product.title}`}
                         target="_blank"
                         rel="noreferrer"
-                        onClick={(e)=>
-                          e.stopPropagation()
-                        }
                         style={{
                           flex:1,
                           background:"#22c55e",
@@ -469,8 +481,7 @@ export default function App() {
                           textAlign:"center",
                           padding:"14px",
                           borderRadius:"14px",
-                          textDecoration:"none",
-                          fontWeight:"bold"
+                          textDecoration:"none"
                         }}
                       >
                         WhatsApp
@@ -492,7 +503,7 @@ export default function App() {
 
       </div>
 
-      {/* PRODUCT MODAL */}
+      {/* MODAL */}
 
       {selectedProduct && (
 
@@ -518,7 +529,7 @@ export default function App() {
             }
             style={{
               background:"#111827",
-              maxWidth:"1100px",
+              maxWidth:"1000px",
               width:"100%",
               borderRadius:"30px",
               overflow:"hidden"
@@ -585,6 +596,48 @@ export default function App() {
         </div>
 
       )}
+
+      {/* CART */}
+
+      <div
+        style={{
+          position:"fixed",
+          right:"20px",
+          bottom:"20px",
+          background:"#111827",
+          padding:"25px",
+          borderRadius:"25px",
+          width:"300px"
+        }}
+      >
+
+        <h2>🛒 Cart</h2>
+
+        <p style={{marginTop:"10px"}}>
+          Items:
+          {" "}
+          {cart.length}
+        </p>
+
+        <h1 style={{marginTop:"15px"}}>
+          ₹{total}
+        </h1>
+
+        <button
+          style={{
+            width:"100%",
+            marginTop:"20px",
+            background:"#6739B7",
+            color:"#fff",
+            padding:"18px",
+            border:"none",
+            borderRadius:"18px"
+          }}
+        >
+          Checkout
+        </button>
+
+      </div>
 
     </div>
 
