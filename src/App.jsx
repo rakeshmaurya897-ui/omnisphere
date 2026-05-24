@@ -8,13 +8,15 @@ items:[
 id:1,
 name:"Floating Moon Lamp",
 price:2499,
-image:"https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=1200&auto=format&fit=crop"
+image:"https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=1200&auto=format&fit=crop",
+description:"Premium floating moon decor lamp with aesthetic lighting."
 },
 {
 id:2,
 name:"Silicone Panda Lamp",
 price:1299,
-image:"https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=1200&auto=format&fit=crop"
+image:"https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=1200&auto=format&fit=crop",
+description:"Cute panda silicone night lamp."
 }
 ]
 },
@@ -26,7 +28,8 @@ items:[
 id:3,
 name:"T800 Ultra Smartwatch",
 price:1999,
-image:"https://images.unsplash.com/photo-1546868871-7041f2a55e12?q=80&w=1200&auto=format&fit=crop"
+image:"https://images.unsplash.com/photo-1546868871-7041f2a55e12?q=80&w=1200&auto=format&fit=crop",
+description:"Bluetooth smartwatch with fitness tracking."
 }
 ]
 },
@@ -38,7 +41,8 @@ items:[
 id:4,
 name:"3D Deep Sea Sandscape",
 price:1899,
-image:"https://images.unsplash.com/photo-1517999144081-1c4eec0a0d0e?q=80&w=1200&auto=format&fit=crop"
+image:"https://images.unsplash.com/photo-1517999144081-1c4eec0a0d0e?q=80&w=1200&auto=format&fit=crop",
+description:"Moving sand art premium decor."
 }
 ]
 },
@@ -50,7 +54,8 @@ items:[
 id:5,
 name:"Mini Portable Projector",
 price:3999,
-image:"https://images.unsplash.com/photo-1487611459768-bd414656ea10?q=80&w=1200&auto=format&fit=crop"
+image:"https://images.unsplash.com/photo-1487611459768-bd414656ea10?q=80&w=1200&auto=format&fit=crop",
+description:"Portable HD projector for movies and gaming."
 }
 ]
 },
@@ -62,7 +67,8 @@ items:[
 id:6,
 name:"Astronaut Night Lamp",
 price:1499,
-image:"https://images.unsplash.com/photo-1520531158340-44015069e78e?q=80&w=1200&auto=format&fit=crop"
+image:"https://images.unsplash.com/photo-1520531158340-44015069e78e?q=80&w=1200&auto=format&fit=crop",
+description:"Astronaut night lamp for kids room."
 }
 ]
 }
@@ -71,6 +77,7 @@ image:"https://images.unsplash.com/photo-1520531158340-44015069e78e?q=80&w=1200&
 export default function App(){
 
 const [cart,setCart] = useState([]);
+const [search,setSearch] = useState("");
 
 const addToCart = (product)=>{
 setCart([...cart,product])
@@ -110,6 +117,20 @@ color:"#ccc"
 Premium Ecommerce Store
 </p>
 
+<input
+placeholder="Search Products..."
+value={search}
+onChange={(e)=>setSearch(e.target.value)}
+style={{
+marginTop:"30px",
+padding:"18px",
+width:"100%",
+borderRadius:"20px",
+border:"none",
+fontSize:"18px"
+}}
+/>
+
 <div style={{
 display:"flex",
 gap:"15px",
@@ -148,7 +169,16 @@ fontWeight:"bold"
 
 </header>
 
-{categories.map((category)=>(
+{categories.map((category)=>{
+
+const filteredItems =
+category.items.filter((product)=>
+product.name.toLowerCase().includes(search.toLowerCase())
+)
+
+if(filteredItems.length===0) return null
+
+return(
 <div key={category.title} style={{marginBottom:"70px"}}>
 
 <div style={{
@@ -165,17 +195,6 @@ fontWeight:"bold"
 {category.title}
 </h2>
 
-<button style={{
-background:"#000",
-color:"#fff",
-padding:"12px 22px",
-borderRadius:"15px",
-border:"none",
-fontWeight:"bold"
-}}>
-View All
-</button>
-
 </div>
 
 <div style={{
@@ -184,7 +203,7 @@ gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))",
 gap:"25px"
 }}>
 
-{category.items.map((product)=>(
+{filteredItems.map((product)=>(
 <div
 key={product.id}
 style={{
@@ -214,6 +233,14 @@ marginBottom:"10px"
 }}>
 {product.name}
 </h3>
+
+<p style={{
+color:"#555",
+marginBottom:"15px",
+lineHeight:"1.6"
+}}>
+{product.description}
+</p>
 
 <p style={{
 fontSize:"32px",
@@ -253,7 +280,7 @@ Add To Cart
 </button>
 
 <a
-href="https://wa.me/919235727927"
+href={`https://wa.me/919235727927?text=I want to order ${product.name}`}
 target="_blank"
 style={{
 flex:1,
@@ -279,7 +306,8 @@ WhatsApp
 </div>
 
 </div>
-))}
+)
+})}
 
 <div style={{
 position:"fixed",
@@ -360,7 +388,11 @@ fontWeight:"bold"
 FREE SHIPPING
 </div>
 
-<button style={{
+<button
+onClick={()=>{
+window.location.href="https://wa.me/919235727927?text=I want to place my order from Omnishpere"
+}}
+style={{
 width:"100%",
 marginTop:"20px",
 background:"#fff",
@@ -370,28 +402,10 @@ borderRadius:"18px",
 border:"none",
 fontWeight:"bold",
 fontSize:"18px"
-}}>
-Pay With PhonePe
-</button>
-
-<div style={{
-marginTop:"15px",
-textAlign:"center"
-}}>
-
-<a
-href="https://wa.me/919235727927"
-target="_blank"
-style={{
-color:"#25D366",
-fontWeight:"bold",
-textDecoration:"none"
 }}
 >
-Need Help? WhatsApp
-</a>
-
-</div>
+Checkout
+</button>
 
 </>
 )}
