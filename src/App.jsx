@@ -18,29 +18,34 @@ fetch("/products.json")
 const formatted = data.map((item,index) => {
 
 const wholesale =
-Number(
-item.price?.replace(/[^\d]/g, "")
-);
+parseInt(item.price) || 0;
 
 const finalPrice =
-Math.round((wholesale * 1.4) + 100);
+Math.round((wholesale * 1.8) + 99);
 
 return {
 id: index + 1,
-name: item.title,
+name: item.title || "Product",
 description:
 item.excerpt ||
-"Premium product",
+item.description ||
+"Premium product available now.",
 category:
 item.categories ||
 "General",
+
 image:
+item.images?.[0]?.src ||
 item.image ||
 item.imageUrl ||
 item.featuredImage ||
-"https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1200&auto=format&fit=crop",
+"https://via.placeholder.com/500",
+
 price: finalPrice,
-url: item.productUrl
+
+url:
+item.productUrl ||
+"#"
 };
 
 });
@@ -72,7 +77,7 @@ return (
 
 <div
 style={{
-background:"#0f172a",
+background:"#071028",
 minHeight:"100vh",
 fontFamily:"Arial",
 color:"#fff"
@@ -83,17 +88,15 @@ color:"#fff"
 style={{
 padding:"30px",
 background:
-"linear-gradient(135deg,#111827,#1e3a8a)",
-position:"sticky",
-top:"0",
-zIndex:"100"
+"linear-gradient(135deg,#0f172a,#1d4ed8)"
 }}
 >
 
 <h1
 style={{
-fontSize:"45px",
-fontWeight:"bold"
+fontSize:"48px",
+fontWeight:"bold",
+margin:"0"
 }}
 >
 Omnishpere
@@ -101,8 +104,8 @@ Omnishpere
 
 <p
 style={{
-color:"#cbd5e1",
-marginTop:"10px"
+marginTop:"10px",
+color:"#cbd5e1"
 }}
 >
 Premium Ecommerce Store
@@ -115,7 +118,7 @@ onChange={(e)=>
 setSearch(e.target.value)
 }
 style={{
-marginTop:"20px",
+marginTop:"25px",
 padding:"16px",
 width:"100%",
 borderRadius:"18px",
@@ -123,6 +126,50 @@ border:"none",
 fontSize:"16px"
 }}
 />
+
+<div
+style={{
+display:"flex",
+gap:"12px",
+marginTop:"20px",
+flexWrap:"wrap"
+}}
+>
+
+<div
+style={{
+background:"#16a34a",
+padding:"10px 18px",
+borderRadius:"999px",
+fontWeight:"bold"
+}}
+>
+🚚 Free Shipping
+</div>
+
+<div
+style={{
+background:"#2563eb",
+padding:"10px 18px",
+borderRadius:"999px",
+fontWeight:"bold"
+}}
+>
+💳 PhonePe Available
+</div>
+
+<div
+style={{
+background:"#dc2626",
+padding:"10px 18px",
+borderRadius:"999px",
+fontWeight:"bold"
+}}
+>
+💵 COD Available
+</div>
+
+</div>
 
 </header>
 
@@ -149,7 +196,7 @@ borderRadius:"25px",
 overflow:"hidden",
 cursor:"pointer",
 boxShadow:
-"0 10px 30px rgba(0,0,0,0.35)"
+"0 10px 30px rgba(0,0,0,0.4)"
 }}
 >
 
@@ -169,7 +216,8 @@ background:"#fff"
 <p
 style={{
 color:"#60a5fa",
-fontSize:"14px"
+fontSize:"14px",
+fontWeight:"bold"
 }}
 >
 {product.category}
@@ -190,7 +238,8 @@ lineHeight:"1.4"
 style={{
 marginTop:"12px",
 color:"#cbd5e1",
-lineHeight:"1.6"
+lineHeight:"1.6",
+minHeight:"70px"
 }}
 >
 {product.description
@@ -199,7 +248,7 @@ lineHeight:"1.6"
 
 <h3
 style={{
-fontSize:"30px",
+fontSize:"32px",
 fontWeight:"bold",
 marginTop:"18px"
 }}
@@ -285,7 +334,7 @@ top:"0",
 left:"0",
 width:"100%",
 height:"100%",
-background:"rgba(0,0,0,0.75)",
+background:"rgba(0,0,0,0.8)",
 display:"flex",
 justifyContent:"center",
 alignItems:"center",
@@ -301,7 +350,7 @@ e.stopPropagation()
 style={{
 background:"#111827",
 borderRadius:"30px",
-maxWidth:"700px",
+maxWidth:"750px",
 width:"100%",
 overflow:"hidden"
 }}
@@ -312,7 +361,7 @@ src={selectedProduct.image}
 alt={selectedProduct.name}
 style={{
 width:"100%",
-height:"400px",
+height:"420px",
 objectFit:"cover"
 }}
 />
@@ -321,7 +370,8 @@ objectFit:"cover"
 
 <p
 style={{
-color:"#60a5fa"
+color:"#60a5fa",
+fontWeight:"bold"
 }}
 >
 {selectedProduct.category}
@@ -329,7 +379,7 @@ color:"#60a5fa"
 
 <h2
 style={{
-fontSize:"38px",
+fontSize:"40px",
 fontWeight:"bold",
 marginTop:"10px"
 }}
@@ -450,15 +500,16 @@ Items: {cart.length}
 style={{
 width:"100%",
 marginTop:"20px",
-background:"#fff",
-color:"#000",
+background:"#6739B7",
+color:"#fff",
 padding:"16px",
 borderRadius:"14px",
 border:"none",
-fontWeight:"bold"
+fontWeight:"bold",
+fontSize:"18px"
 }}
 >
-Checkout
+Pay With PhonePe
 </button>
 
 </div>
