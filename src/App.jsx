@@ -18,7 +18,8 @@ export default function App() {
 
           id: item.id || index,
 
-          title: item.title || "Product",
+          title:
+            item.title || "Product",
 
           description:
             item.description ||
@@ -31,19 +32,23 @@ export default function App() {
 
           image:
             item.images?.[0] ||
+            item.imageUrl ||
             "https://picsum.photos/500",
 
           images:
-            item.images || [],
+            item.images ||
+            [item.imageUrl],
 
           price:
             parseInt(
-              item.sellingPrice?.replace(/[₹,]/g, "")
+              item.sellingPrice
+                ?.replace(/[₹,]/g, "")
             ) || 0,
 
           originalPrice:
             parseInt(
-              item.price?.replace(/[₹,]/g, "")
+              item.price
+                ?.replace(/[₹,]/g, "")
             ) || 0,
 
           productUrl:
@@ -56,6 +61,9 @@ export default function App() {
 
         setProducts(formatted);
 
+      })
+      .catch((err)=>{
+        console.log(err);
       });
 
   }, []);
@@ -71,16 +79,16 @@ export default function App() {
     );
 
   const filteredProducts =
-    products.filter((p) =>
+    products.filter((p)=>
       p.title
         .toLowerCase()
         .includes(search.toLowerCase())
     );
 
   const groupedProducts =
-    filteredProducts.reduce((acc, product) => {
+    filteredProducts.reduce((acc, product)=>{
 
-      if (!acc[product.category]) {
+      if(!acc[product.category]){
         acc[product.category] = [];
       }
 
@@ -786,4 +794,4 @@ export default function App() {
 
   );
 
-                              }
+}
