@@ -31,24 +31,28 @@ export default function App() {
               .trim() || "General",
 
           image:
-            item.images?.[0] ||
-            item.imageUrl ||
+            (
+              Array.isArray(item.images)
+              ? item.images[0]
+              : item.imageUrl
+            ) ||
             "https://picsum.photos/500",
 
           images:
-            item.images ||
-            [item.imageUrl],
+            Array.isArray(item.images)
+            ? item.images
+            : [item.imageUrl],
 
           price:
-            parseInt(
-              item.sellingPrice
-                ?.replace(/[₹,]/g, "")
+            Number(
+              String(item.sellingPrice || "")
+              .replace(/[^\d.]/g,"")
             ) || 0,
 
           originalPrice:
-            parseInt(
-              item.price
-                ?.replace(/[₹,]/g, "")
+            Number(
+              String(item.price || "")
+              .replace(/[^\d.]/g,"")
             ) || 0,
 
           productUrl:
@@ -172,45 +176,6 @@ export default function App() {
               experience.
             </p>
 
-            <div
-              style={{
-                display:"flex",
-                gap:"15px",
-                marginTop:"30px",
-                flexWrap:"wrap"
-              }}
-            >
-
-              <button
-                style={{
-                  background:"#fff",
-                  color:"#000",
-                  border:"none",
-                  padding:"18px 30px",
-                  borderRadius:"18px",
-                  fontWeight:"bold",
-                  fontSize:"18px"
-                }}
-              >
-                Shop Now
-              </button>
-
-              <button
-                style={{
-                  background:"transparent",
-                  color:"#fff",
-                  border:"2px solid #fff",
-                  padding:"18px 30px",
-                  borderRadius:"18px",
-                  fontWeight:"bold",
-                  fontSize:"18px"
-                }}
-              >
-                Best Sellers
-              </button>
-
-            </div>
-
           </div>
 
           <div>
@@ -222,9 +187,7 @@ export default function App() {
                 width:"100%",
                 height:"550px",
                 objectFit:"cover",
-                borderRadius:"35px",
-                boxShadow:
-                "0 20px 60px rgba(0,0,0,0.5)"
+                borderRadius:"35px"
               }}
             />
 
@@ -393,9 +356,7 @@ export default function App() {
                     background:"#111827",
                     borderRadius:"30px",
                     overflow:"hidden",
-                    cursor:"pointer",
-                    boxShadow:
-                    "0 10px 30px rgba(0,0,0,0.5)"
+                    cursor:"pointer"
                   }}
                 >
 
@@ -423,8 +384,7 @@ export default function App() {
                     <h3
                       style={{
                         marginTop:"10px",
-                        lineHeight:"1.5",
-                        minHeight:"75px"
+                        lineHeight:"1.5"
                       }}
                     >
                       {product.title}
@@ -434,8 +394,7 @@ export default function App() {
                       style={{
                         color:"#cbd5e1",
                         marginTop:"12px",
-                        lineHeight:"1.7",
-                        minHeight:"70px"
+                        lineHeight:"1.7"
                       }}
                     >
                       {product.description
@@ -499,6 +458,7 @@ export default function App() {
                       <a
                         href={`https://wa.me/919235727927?text=I want to order ${product.title}`}
                         target="_blank"
+                        rel="noreferrer"
                         onClick={(e)=>
                           e.stopPropagation()
                         }
@@ -561,10 +521,7 @@ export default function App() {
               maxWidth:"1100px",
               width:"100%",
               borderRadius:"30px",
-              overflow:"hidden",
-              display:"grid",
-              gridTemplateColumns:
-              "repeat(auto-fit,minmax(350px,1fr))"
+              overflow:"hidden"
             }}
           >
 
@@ -605,11 +562,7 @@ export default function App() {
                       height:"80px",
                       objectFit:"cover",
                       borderRadius:"12px",
-                      cursor:"pointer",
-                      border:
-                      selectedImage===img
-                      ? "3px solid #2563eb"
-                      : "2px solid #334155"
+                      cursor:"pointer"
                     }}
                   />
 
@@ -617,126 +570,13 @@ export default function App() {
 
               </div>
 
-            </div>
-
-            <div style={{padding:"30px"}}>
-
-              <p
-                style={{
-                  color:"#60a5fa",
-                  fontWeight:"bold"
-                }}
-              >
-                {selectedProduct.category}
-              </p>
-
-              <h1
-                style={{
-                  fontSize:"42px",
-                  marginTop:"12px",
-                  lineHeight:"1.3"
-                }}
-              >
+              <h1 style={{marginTop:"20px"}}>
                 {selectedProduct.title}
               </h1>
 
-              <div
-                style={{
-                  display:"flex",
-                  alignItems:"center",
-                  gap:"12px",
-                  marginTop:"20px"
-                }}
-              >
-
-                <h1 style={{color:"#22c55e"}}>
-                  ₹{selectedProduct.price}
-                </h1>
-
-                <span
-                  style={{
-                    textDecoration:"line-through",
-                    color:"#94a3b8",
-                    fontSize:"24px"
-                  }}
-                >
-                  ₹{selectedProduct.originalPrice}
-                </span>
-
-              </div>
-
-              <p
-                style={{
-                  marginTop:"25px",
-                  lineHeight:"1.9",
-                  color:"#cbd5e1"
-                }}
-              >
+              <p style={{marginTop:"15px"}}>
                 {selectedProduct.description}
               </p>
-
-              <div
-                style={{
-                  display:"flex",
-                  gap:"15px",
-                  marginTop:"30px",
-                  flexWrap:"wrap"
-                }}
-              >
-
-                <button
-                  onClick={()=>
-                    addToCart(selectedProduct)
-                  }
-                  style={{
-                    flex:1,
-                    background:"#2563eb",
-                    color:"#fff",
-                    border:"none",
-                    padding:"18px",
-                    borderRadius:"18px",
-                    fontWeight:"bold",
-                    fontSize:"18px"
-                  }}
-                >
-                  Add To Cart
-                </button>
-
-                <button
-                  style={{
-                    flex:1,
-                    background:"#6739B7",
-                    color:"#fff",
-                    border:"none",
-                    padding:"18px",
-                    borderRadius:"18px",
-                    fontWeight:"bold",
-                    fontSize:"18px"
-                  }}
-                >
-                  Pay With PhonePe
-                </button>
-
-              </div>
-
-              <a
-                href={`https://wa.me/919235727927?text=I want to order ${selectedProduct.title}`}
-                target="_blank"
-                style={{
-                  display:"block",
-                  marginTop:"18px",
-                  background:"#22c55e",
-                  color:"#fff",
-                  textAlign:"center",
-                  padding:"18px",
-                  borderRadius:"18px",
-                  textDecoration:"none",
-                  fontWeight:"bold",
-                  fontSize:"18px"
-                }}
-              >
-                Buy On WhatsApp
-              </a>
 
             </div>
 
@@ -745,50 +585,6 @@ export default function App() {
         </div>
 
       )}
-
-      {/* CART */}
-
-      <div
-        style={{
-          position:"fixed",
-          right:"20px",
-          bottom:"20px",
-          background:"#111827",
-          padding:"25px",
-          borderRadius:"25px",
-          width:"320px",
-          boxShadow:
-          "0 10px 40px rgba(0,0,0,0.5)"
-        }}
-      >
-
-        <h2>🛒 Cart</h2>
-
-        <p style={{marginTop:"10px"}}>
-          Items: {cart.length}
-        </p>
-
-        <h1 style={{marginTop:"15px"}}>
-          ₹{total}
-        </h1>
-
-        <button
-          style={{
-            width:"100%",
-            marginTop:"20px",
-            background:"#6739B7",
-            color:"#fff",
-            padding:"18px",
-            border:"none",
-            borderRadius:"18px",
-            fontWeight:"bold",
-            fontSize:"18px"
-          }}
-        >
-          Checkout
-        </button>
-
-      </div>
 
     </div>
 
