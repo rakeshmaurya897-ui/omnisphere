@@ -1,7 +1,4 @@
-import React, { useEffect, useState } from "react";
-import "./App.css";
-
-export default function App() {
+import React, { useEffect, useState } from "react";export default function App() {
 
 const [products, setProducts] = useState([]);
 const [search, setSearch] = useState("");
