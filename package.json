@@ -1,18 +1,17 @@
+
 {
-  "name": "@caffeine/template-app",
-  "type": "module",
-  "engines": {
-    "node": ">=16.0.0",
-    "pnpm": ">=7.0.0",
-    "npm": "please use pnpm"
+  "name":"omnishpere-store",
+  "private":true,
+  "version":"1.0.0",
+  "scripts":{
+    "dev":"vite",
+    "build":"vite build"
   },
-  "scripts": {
-    "build": "pnpm -r --if-present run build",
-    "typecheck": "pnpm -r --if-present run typecheck",
-    "check": "pnpm -r --if-present run check",
-    "fix": "pnpm -r --if-present run fix"
+  "dependencies":{
+    "react":"^18.2.0",
+    "react-dom":"^18.2.0"
   },
-  "devDependencies": {
-    "sharp": "^0.34.4"
+  "devDependencies":{
+    "vite":"^5.0.0"
   }
 }
