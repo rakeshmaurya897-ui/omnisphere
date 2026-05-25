@@ -1,318 +1,433 @@
 import React, { useEffect, useState } from "react";
 
 export default function App() {
+
   const [products, setProducts] = useState([]);
-  const [search, setSearch] = useState("");
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedImage, setSelectedImage] = useState("");
 
   useEffect(() => {
+
     fetch("/products.json")
       .then((res) => res.json())
       .then((data) => {
-        console.log("Loaded Products:", data.length);
         setProducts(data);
-      })
-      .catch((err) => {
-        console.error("Fetch Error:", err);
       });
+
   }, []);
 
-  const filteredProducts = products.filter((item) =>
-    item.title?.toLowerCase().includes(search.toLowerCase())
-  );
-
   return (
+
     <div
       style={{
-        background: "#020617",
-        minHeight: "100vh",
-        color: "white",
-        padding: "15px",
-        fontFamily: "serif",
+        background:"#020617",
+        minHeight:"100vh",
+        color:"white",
+        padding:"20px",
+        fontFamily:"Arial"
       }}
     >
-      {/* HERO SECTION */}
+
+      {/* HERO */}
 
       <div
         style={{
           background:
-            "linear-gradient(135deg,#1d4ed8,#7c3aed)",
-          borderRadius: "30px",
-          padding: "30px",
-          marginBottom: "30px",
+          "linear-gradient(135deg,#1d4ed8,#7c3aed)",
+          padding:"40px",
+          borderRadius:"30px",
+          marginBottom:"30px"
         }}
       >
-        <div
+
+        <h1
           style={{
-            display: "grid",
-            gridTemplateColumns:
-              "repeat(auto-fit,minmax(300px,1fr))",
-            gap: "20px",
-            alignItems: "center",
+            fontSize:"70px",
+            lineHeight:"75px",
+            fontStyle:"italic"
           }}
         >
-          <div>
-            <div
-              style={{
-                background: "rgba(255,255,255,0.15)",
-                display: "inline-block",
-                padding: "8px 14px",
-                borderRadius: "20px",
-                marginBottom: "15px",
-                fontSize: "14px",
-              }}
-            >
-              🔥 Trending Ecommerce Store
-            </div>
+          Discover Viral Products
+        </h1>
 
-            <h1
-              style={{
-                fontSize: "70px",
-                lineHeight: "75px",
-                marginBottom: "20px",
-                fontStyle: "italic",
-              }}
-            >
-              Discover <br />
-              Viral Products
-            </h1>
+        <p
+          style={{
+            marginTop:"20px",
+            color:"#ddd",
+            fontSize:"20px"
+          }}
+        >
+          Trending gadgets, decor,
+          toys and premium lifestyle products.
+        </p>
 
-            <p
-              style={{
-                fontSize: "20px",
-                color: "#ddd",
-                marginBottom: "25px",
-              }}
-            >
-              Explore trending gadgets, gifts,
-              decor, lamps, toys and premium
-              lifestyle products.
-            </p>
-
-            <div
-              style={{
-                display: "flex",
-                gap: "15px",
-                flexWrap: "wrap",
-              }}
-            >
-              <button
-                style={{
-                  padding: "14px 28px",
-                  borderRadius: "14px",
-                  border: "none",
-                  background: "white",
-                  color: "#111",
-                  fontWeight: "bold",
-                  cursor: "pointer",
-                }}
-              >
-                Shop Now
-              </button>
-
-              <button
-                style={{
-                  padding: "14px 28px",
-                  borderRadius: "14px",
-                  border: "2px solid white",
-                  background: "transparent",
-                  color: "white",
-                  fontWeight: "bold",
-                  cursor: "pointer",
-                }}
-              >
-                Best Sellers
-              </button>
-            </div>
-          </div>
-
-          <div>
-            <img
-              src="https://images.unsplash.com/photo-1546868871-7041f2a55e12?q=80&w=1200&auto=format&fit=crop"
-              alt=""
-              style={{
-                width: "100%",
-                borderRadius: "25px",
-                height: "420px",
-                objectFit: "cover",
-              }}
-            />
-          </div>
-        </div>
       </div>
-
-      {/* SEARCH */}
-
-      <input
-        type="text"
-        placeholder="Search Products..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        style={{
-          width: "100%",
-          padding: "18px",
-          borderRadius: "14px",
-          border: "none",
-          marginBottom: "20px",
-          fontSize: "17px",
-        }}
-      />
-
-      <p style={{ marginBottom: "25px" }}>
-        Products Loaded: {products.length}
-      </p>
-
-      {/* TITLE */}
-
-      <h2
-        style={{
-          fontSize: "55px",
-          marginBottom: "30px",
-          fontStyle: "italic",
-        }}
-      >
-        🔥 Best Sellers
-      </h2>
 
       {/* PRODUCTS */}
 
       <div
         style={{
-          display: "grid",
+          display:"grid",
           gridTemplateColumns:
-            "repeat(auto-fit,minmax(280px,1fr))",
-          gap: "25px",
+          "repeat(auto-fit,minmax(280px,1fr))",
+          gap:"25px"
         }}
       >
-        {filteredProducts.map((item, index) => (
+
+        {products.map((item,index)=>(
+
           <div
             key={index}
             style={{
-              background: "#0f172a",
-              borderRadius: "24px",
-              overflow: "hidden",
-              boxShadow:
-                "0 10px 30px rgba(0,0,0,0.4)",
+              background:"#0f172a",
+              borderRadius:"24px",
+              overflow:"hidden"
             }}
           >
+
             <img
               src={
-                item.images?.[0] ||
-                "https://via.placeholder.com/400"
+                item.images?.[0]
               }
-              alt={item.title}
+              alt=""
               style={{
-                width: "100%",
-                height: "280px",
-                objectFit: "cover",
-                background: "#111",
+                width:"100%",
+                height:"300px",
+                objectFit:"cover"
               }}
             />
 
-            <div style={{ padding: "18px" }}>
+            <div style={{padding:"18px"}}>
+
               <p
                 style={{
-                  color: "#60a5fa",
-                  fontSize: "13px",
-                  marginBottom: "10px",
+                  color:"#60a5fa"
                 }}
               >
                 {item.category}
               </p>
 
-              <h3
+              <h2
                 style={{
-                  fontSize: "24px",
-                  lineHeight: "32px",
-                  marginBottom: "12px",
+                  marginTop:"10px",
+                  lineHeight:"35px",
+                  height:"70px",
+                  overflow:"hidden"
                 }}
               >
                 {item.title}
-              </h3>
-
-              <p
-                style={{
-                  color: "#cbd5e1",
-                  fontSize: "15px",
-                  height: "70px",
-                  overflow: "hidden",
-                  marginBottom: "15px",
-                }}
-              >
-                {item.description}
-              </p>
+              </h2>
 
               <div
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "12px",
-                  marginBottom: "18px",
+                  display:"flex",
+                  gap:"10px",
+                  alignItems:"center",
+                  marginTop:"15px"
                 }}
               >
-                <span
+
+                <h1
                   style={{
-                    color: "#22c55e",
-                    fontSize: "32px",
-                    fontWeight: "bold",
+                    color:"#22c55e"
                   }}
                 >
                   {item.sellingPrice}
-                </span>
+                </h1>
 
                 <span
                   style={{
-                    color: "#94a3b8",
-                    textDecoration: "line-through",
-                    fontSize: "18px",
+                    textDecoration:"line-through",
+                    color:"#94a3b8"
                   }}
                 >
                   {item.price}
                 </span>
+
               </div>
 
-              <div
+              <button
+                onClick={()=>{
+                  setSelectedProduct(item);
+                  setSelectedImage(
+                    item.images?.[0]
+                  );
+                }}
                 style={{
-                  display: "flex",
-                  gap: "10px",
+                  width:"100%",
+                  marginTop:"20px",
+                  background:"#2563eb",
+                  border:"none",
+                  padding:"14px",
+                  borderRadius:"12px",
+                  color:"white",
+                  fontWeight:"bold",
+                  cursor:"pointer"
                 }}
               >
-                <button
-                  style={{
-                    flex: 1,
-                    background: "#2563eb",
-                    border: "none",
-                    padding: "14px",
-                    borderRadius: "12px",
-                    color: "white",
-                    fontWeight: "bold",
-                    cursor: "pointer",
-                  }}
-                >
-                  Add To Cart
-                </button>
+                View Product
+              </button>
 
-                <a
-                  href={item.productUrl}
-                  target="_blank"
-                  rel="noreferrer"
+            </div>
+
+          </div>
+
+        ))}
+
+      </div>
+
+      {/* PRODUCT DETAIL MODAL */}
+
+      {selectedProduct && (
+
+        <div
+          onClick={()=>
+            setSelectedProduct(null)
+          }
+          style={{
+            position:"fixed",
+            inset:"0",
+            background:"rgba(0,0,0,0.85)",
+            display:"flex",
+            justifyContent:"center",
+            alignItems:"center",
+            zIndex:"999",
+            padding:"20px"
+          }}
+        >
+
+          <div
+            onClick={(e)=>
+              e.stopPropagation()
+            }
+            style={{
+              background:"#111827",
+              width:"100%",
+              maxWidth:"1200px",
+              borderRadius:"30px",
+              overflow:"hidden",
+              maxHeight:"95vh",
+              overflowY:"auto"
+            }}
+          >
+
+            <div
+              style={{
+                display:"grid",
+                gridTemplateColumns:
+                "repeat(auto-fit,minmax(400px,1fr))",
+                gap:"30px",
+                padding:"30px"
+              }}
+            >
+
+              {/* LEFT */}
+
+              <div>
+
+                <img
+                  src={selectedImage}
+                  alt=""
                   style={{
-                    flex: 1,
-                    background: "#22c55e",
-                    padding: "14px",
-                    borderRadius: "12px",
-                    color: "white",
-                    textAlign: "center",
-                    textDecoration: "none",
-                    fontWeight: "bold",
+                    width:"100%",
+                    height:"500px",
+                    objectFit:"cover",
+                    borderRadius:"20px"
+                  }}
+                />
+
+                <div
+                  style={{
+                    display:"flex",
+                    gap:"10px",
+                    marginTop:"15px",
+                    overflowX:"auto"
                   }}
                 >
-                  View
-                </a>
+
+                  {selectedProduct.images?.map(
+                    (img,index)=>(
+
+                    <img
+                      key={index}
+                      src={img}
+                      alt=""
+                      onClick={()=>
+                        setSelectedImage(img)
+                      }
+                      style={{
+                        width:"90px",
+                        height:"90px",
+                        objectFit:"cover",
+                        borderRadius:"12px",
+                        cursor:"pointer",
+                        border:
+                        selectedImage===img
+                        ? "3px solid #2563eb"
+                        : "none"
+                      }}
+                    />
+
+                  ))}
+
+                </div>
+
               </div>
+
+              {/* RIGHT */}
+
+              <div>
+
+                <p
+                  style={{
+                    color:"#60a5fa",
+                    fontSize:"18px"
+                  }}
+                >
+                  {selectedProduct.category}
+                </p>
+
+                <h1
+                  style={{
+                    fontSize:"42px",
+                    lineHeight:"55px",
+                    marginTop:"10px"
+                  }}
+                >
+                  {selectedProduct.title}
+                </h1>
+
+                <div
+                  style={{
+                    display:"flex",
+                    alignItems:"center",
+                    gap:"15px",
+                    marginTop:"20px"
+                  }}
+                >
+
+                  <h1
+                    style={{
+                      color:"#22c55e",
+                      fontSize:"45px"
+                    }}
+                  >
+                    {selectedProduct.sellingPrice}
+                  </h1>
+
+                  <span
+                    style={{
+                      textDecoration:"line-through",
+                      color:"#94a3b8",
+                      fontSize:"25px"
+                    }}
+                  >
+                    {selectedProduct.price}
+                  </span>
+
+                </div>
+
+                <p
+                  style={{
+                    marginTop:"25px",
+                    color:"#cbd5e1",
+                    lineHeight:"32px",
+                    fontSize:"18px"
+                  }}
+                >
+                  {selectedProduct.description}
+                </p>
+
+                {/* FEATURES */}
+
+                <div
+                  style={{
+                    marginTop:"30px",
+                    background:"#0f172a",
+                    padding:"20px",
+                    borderRadius:"20px"
+                  }}
+                >
+
+                  <h2>
+                    Product Features
+                  </h2>
+
+                  <ul
+                    style={{
+                      marginTop:"15px",
+                      lineHeight:"35px",
+                      color:"#cbd5e1"
+                    }}
+                  >
+                    <li>✅ Premium Quality</li>
+                    <li>✅ Trending Product</li>
+                    <li>✅ Fast Delivery</li>
+                    <li>✅ Cash On Delivery</li>
+                    <li>✅ Best Gift Item</li>
+                  </ul>
+
+                </div>
+
+                {/* BUTTONS */}
+
+                <div
+                  style={{
+                    display:"flex",
+                    gap:"15px",
+                    marginTop:"30px"
+                  }}
+                >
+
+                  <button
+                    style={{
+                      flex:1,
+                      background:"#2563eb",
+                      border:"none",
+                      padding:"18px",
+                      borderRadius:"15px",
+                      color:"white",
+                      fontWeight:"bold",
+                      fontSize:"18px",
+                      cursor:"pointer"
+                    }}
+                  >
+                    Add To Cart
+                  </button>
+
+                  <a
+                    href={`https://wa.me/919235727927?text=I want to order ${selectedProduct.title}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{
+                      flex:1,
+                      background:"#22c55e",
+                      padding:"18px",
+                      borderRadius:"15px",
+                      color:"white",
+                      textAlign:"center",
+                      textDecoration:"none",
+                      fontWeight:"bold",
+                      fontSize:"18px"
+                    }}
+                  >
+                    WhatsApp Order
+                  </a>
+
+                </div>
+
+              </div>
+
             </div>
+
           </div>
-        ))}
-      </div>
+
+        </div>
+
+      )}
+
     </div>
+
   );
+
 }
