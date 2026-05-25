@@ -4,6 +4,7 @@ export default function App() {
 
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedImage, setSelectedImage] = useState("");
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
 
@@ -15,19 +16,9 @@ export default function App() {
     fetch("/products.json")
       .then((res) => res.json())
       .then((data) => {
-
-        const formatted = data.map((item) => ({
-          ...item,
-          previewImage:
-            item.images?.[0] || ""
-        }));
-
-        setProducts(formatted);
-
+        setProducts(data);
       })
-      .catch((err) => {
-        console.log(err);
-      });
+      .catch((err) => console.log(err));
 
   }, []);
 
@@ -35,44 +26,43 @@ export default function App() {
 
   const categories = [
     "All",
-    ...new Set(
-      products.map((p) => p.category)
-    )
+    ...new Set(products.map((p) => p.category))
   ];
 
   // FILTER
 
-  const filteredProducts =
-    products.filter((item) => {
+  const filteredProducts = products.filter((item) => {
 
-      const matchSearch =
-        item.title
-          ?.toLowerCase()
-          .includes(
-            search.toLowerCase()
-          );
+    const matchSearch =
+      item.title
+        ?.toLowerCase()
+        .includes(search.toLowerCase());
 
-      const matchCategory =
-        activeCategory === "All"
-          ? true
-          : item.category === activeCategory;
+    const matchCategory =
+      activeCategory === "All"
+        ? true
+        : item.category === activeCategory;
 
-      return (
-        matchSearch &&
-        matchCategory
-      );
+    return matchSearch && matchCategory;
 
-    });
+  });
+
+  // OPEN PRODUCT
+
+  const openProduct = (product) => {
+
+    setSelectedProduct(product);
+    setSelectedImage(product.images?.[0]);
+
+  };
 
   // CART
 
   const addToCart = (product) => {
 
-    const exists =
-      cart.find(
-        (item) =>
-          item.id === product.id
-      );
+    const exists = cart.find(
+      (item) => item.id === product.id
+    );
 
     if (exists) {
 
@@ -104,6 +94,8 @@ export default function App() {
     setCartOpen(true);
 
   };
+
+  // QUANTITY
 
   const increaseQty = (id) => {
 
@@ -141,24 +133,21 @@ export default function App() {
 
   };
 
-  // PRICE
+  // TOTAL
 
-  const totalPrice =
-    cart.reduce((acc, item) => {
+  const totalPrice = cart.reduce(
+    (acc, item) => {
 
       const price =
         parseInt(
-          item.sellingPrice?.replace(
-            /[^\d]/g,
-            ""
-          )
+          item.sellingPrice?.replace(/[^\d]/g, "")
         ) || 0;
 
-      return (
-        acc + price * item.qty
-      );
+      return acc + price * item.qty;
 
-    }, 0);
+    },
+    0
+  );
 
   return (
 
@@ -178,17 +167,13 @@ export default function App() {
           position: "sticky",
           top: 0,
           zIndex: 1000,
-          background:
-            "rgba(2,6,23,0.9)",
-          backdropFilter:
-            "blur(10px)",
-          padding:
-            "18px 25px",
+          background: "rgba(2,6,23,0.9)",
+          backdropFilter: "blur(10px)",
+          padding: "18px 25px",
           borderBottom:
             "1px solid rgba(255,255,255,0.08)",
           display: "flex",
-          justifyContent:
-            "space-between",
+          justifyContent: "space-between",
           alignItems: "center",
           flexWrap: "wrap",
           gap: "15px"
@@ -270,8 +255,7 @@ export default function App() {
           style={{
             background: "#111827",
             border: "none",
-            padding:
-              "12px 18px",
+            padding: "12px 18px",
             borderRadius: "12px",
             color: "#fff",
             cursor: "pointer",
@@ -287,7 +271,7 @@ export default function App() {
 
       <section
         style={{
-          padding: "50px 25px",
+          padding: "60px 25px",
           background:
             "linear-gradient(135deg,#1d4ed8,#7c3aed)"
         }}
@@ -309,10 +293,8 @@ export default function App() {
               style={{
                 background:
                   "rgba(255,255,255,0.15)",
-                padding:
-                  "8px 16px",
-                borderRadius:
-                  "20px",
+                padding: "8px 16px",
+                borderRadius: "20px",
                 fontSize: "13px"
               }}
             >
@@ -341,56 +323,9 @@ export default function App() {
               }}
             >
               Explore trending gadgets,
-              gifts, decor and
-              premium lifestyle
-              products with modern
-              shopping experience.
+              gifts, decor and premium
+              lifestyle products.
             </p>
-
-            <div
-              style={{
-                display: "flex",
-                gap: "15px",
-                marginTop: "28px",
-                flexWrap: "wrap"
-              }}
-            >
-
-              <button
-                style={{
-                  padding:
-                    "14px 24px",
-                  borderRadius:
-                    "14px",
-                  border: "none",
-                  background:
-                    "#fff",
-                  fontWeight: "700",
-                  cursor: "pointer"
-                }}
-              >
-                Shop Now
-              </button>
-
-              <button
-                style={{
-                  padding:
-                    "14px 24px",
-                  borderRadius:
-                    "14px",
-                  border:
-                    "2px solid rgba(255,255,255,0.4)",
-                  background:
-                    "transparent",
-                  color: "#fff",
-                  fontWeight: "700",
-                  cursor: "pointer"
-                }}
-              >
-                Explore Products
-              </button>
-
-            </div>
 
           </div>
 
@@ -437,10 +372,8 @@ export default function App() {
                 setActiveCategory(cat)
               }
               style={{
-                padding:
-                  "12px 20px",
-                borderRadius:
-                  "30px",
+                padding: "12px 20px",
+                borderRadius: "30px",
                 border: "none",
                 background:
                   activeCategory === cat
@@ -464,8 +397,7 @@ export default function App() {
 
       <section
         style={{
-          padding:
-            "0 25px 80px"
+          padding: "0 25px 80px"
         }}
       >
 
@@ -492,27 +424,19 @@ export default function App() {
             <div
               key={i}
               style={{
-                background:
-                  "#071028",
-                borderRadius:
-                  "22px",
-                overflow:
-                  "hidden",
-                transition:
-                  "0.3s"
+                background: "#071028",
+                borderRadius: "22px",
+                overflow: "hidden"
               }}
             >
 
               <img
-                src={
-                  product.images?.[0]
-                }
+                src={product.images?.[0]}
                 alt=""
                 style={{
                   width: "100%",
                   height: "240px",
-                  objectFit:
-                    "cover"
+                  objectFit: "cover"
                 }}
               />
 
@@ -524,10 +448,8 @@ export default function App() {
 
                 <p
                   style={{
-                    color:
-                      "#60a5fa",
-                    fontSize:
-                      "13px"
+                    color: "#60a5fa",
+                    fontSize: "13px"
                   }}
                 >
                   {product.category}
@@ -535,12 +457,9 @@ export default function App() {
 
                 <h3
                   style={{
-                    marginTop:
-                      "10px",
-                    lineHeight:
-                      "1.5",
-                    minHeight:
-                      "70px"
+                    marginTop: "10px",
+                    lineHeight: "1.5",
+                    minHeight: "70px"
                   }}
                 >
                   {product.title}
@@ -548,37 +467,27 @@ export default function App() {
 
                 <div
                   style={{
-                    display:
-                      "flex",
+                    display: "flex",
                     gap: "12px",
-                    alignItems:
-                      "center",
-                    marginTop:
-                      "15px"
+                    alignItems: "center",
+                    marginTop: "15px"
                   }}
                 >
 
                   <span
                     style={{
-                      color:
-                        "#22c55e",
-                      fontSize:
-                        "30px",
-                      fontWeight:
-                        "800"
+                      color: "#22c55e",
+                      fontSize: "30px",
+                      fontWeight: "800"
                     }}
                   >
-                    {
-                      product.sellingPrice
-                    }
+                    {product.sellingPrice}
                   </span>
 
                   <span
                     style={{
-                      color:
-                        "#94a3b8",
-                      textDecoration:
-                        "line-through"
+                      color: "#94a3b8",
+                      textDecoration: "line-through"
                     }}
                   >
                     ₹
@@ -596,38 +505,25 @@ export default function App() {
 
                 <div
                   style={{
-                    display:
-                      "flex",
+                    display: "flex",
                     gap: "10px",
-                    marginTop:
-                      "20px"
+                    marginTop: "20px"
                   }}
                 >
 
                   <button
                     onClick={() =>
-                      setSelectedProduct({
-                        ...product,
-                        previewImage:
-                          product.images?.[0]
-                      })
+                      openProduct(product)
                     }
                     style={{
                       flex: 1,
-                      padding:
-                        "12px",
-                      border:
-                        "none",
-                      borderRadius:
-                        "12px",
-                      background:
-                        "#111827",
-                      color:
-                        "#fff",
-                      fontWeight:
-                        "700",
-                      cursor:
-                        "pointer"
+                      padding: "12px",
+                      border: "none",
+                      borderRadius: "12px",
+                      background: "#111827",
+                      color: "#fff",
+                      fontWeight: "700",
+                      cursor: "pointer"
                     }}
                   >
                     View
@@ -635,26 +531,18 @@ export default function App() {
 
                   <button
                     onClick={() =>
-                      addToCart(
-                        product
-                      )
+                      addToCart(product)
                     }
                     style={{
                       flex: 1,
-                      padding:
-                        "12px",
-                      border:
-                        "none",
-                      borderRadius:
-                        "12px",
+                      padding: "12px",
+                      border: "none",
+                      borderRadius: "12px",
                       background:
                         "linear-gradient(135deg,#2563eb,#7c3aed)",
-                      color:
-                        "#fff",
-                      fontWeight:
-                        "700",
-                      cursor:
-                        "pointer"
+                      color: "#fff",
+                      fontWeight: "700",
+                      cursor: "pointer"
                     }}
                   >
                     Add
@@ -672,7 +560,7 @@ export default function App() {
 
       </section>
 
-      {/* MODAL */}
+      {/* PRODUCT MODAL */}
 
       {selectedProduct && (
 
@@ -687,10 +575,8 @@ export default function App() {
               "rgba(0,0,0,0.85)",
             zIndex: 9999,
             display: "flex",
-            justifyContent:
-              "center",
-            alignItems:
-              "center",
+            justifyContent: "center",
+            alignItems: "center",
             padding: "20px",
             overflowY: "auto"
           }}
@@ -701,20 +587,14 @@ export default function App() {
               e.stopPropagation()
             }
             style={{
-              background:
-                "#0f172a",
+              background: "#0f172a",
               width: "100%",
-              maxWidth: "900px",
-              borderRadius:
-                "24px",
-              overflow:
-                "hidden",
-              position:
-                "relative",
-              maxHeight:
-                "95vh",
-              overflowY:
-                "auto"
+              maxWidth: "950px",
+              borderRadius: "24px",
+              overflow: "hidden",
+              position: "relative",
+              maxHeight: "95vh",
+              overflowY: "auto"
             }}
           >
 
@@ -725,47 +605,84 @@ export default function App() {
                 setSelectedProduct(null)
               }
               style={{
-                position:
-                  "absolute",
+                position: "absolute",
                 top: "15px",
                 right: "15px",
-                width: "45px",
-                height: "45px",
-                borderRadius:
-                  "50%",
-                border:
-                  "none",
-                background:
-                  "#fff",
-                color:
-                  "#000",
-                fontWeight:
-                  "700",
-                cursor:
-                  "pointer",
-                zIndex:
-                  100
+                width: "42px",
+                height: "42px",
+                borderRadius: "50%",
+                border: "none",
+                background: "#fff",
+                color: "#000",
+                fontSize: "20px",
+                fontWeight: "700",
+                cursor: "pointer",
+                zIndex: 100
               }}
             >
               ✕
             </button>
 
-            {/* MAIN IMAGE */}
+            {/* IMAGE */}
 
-            <img
-              src={
-                selectedProduct.previewImage
-              }
-              alt=""
+            <div
               style={{
-                width: "100%",
-                height: "500px",
-                objectFit:
-                  "contain",
-                background:
-                  "#000"
+                padding: "25px"
               }}
-            />
+            >
+
+              <img
+                src={selectedImage}
+                alt=""
+                style={{
+                  width: "100%",
+                  height: "500px",
+                  objectFit: "contain",
+                  borderRadius: "18px",
+                  background: "#000"
+                }}
+              />
+
+              {/* THUMBNAILS */}
+
+              <div
+                style={{
+                  display: "flex",
+                  gap: "10px",
+                  marginTop: "15px",
+                  overflowX: "auto"
+                }}
+              >
+
+                {selectedProduct.images?.map(
+                  (img, index) => (
+
+                    <img
+                      key={index}
+                      src={img}
+                      alt=""
+                      onClick={() =>
+                        setSelectedImage(img)
+                      }
+                      style={{
+                        width: "85px",
+                        height: "85px",
+                        objectFit: "cover",
+                        borderRadius: "12px",
+                        cursor: "pointer",
+                        border:
+                          selectedImage === img
+                            ? "3px solid #2563eb"
+                            : "2px solid transparent"
+                      }}
+                    />
+
+                  )
+                )}
+
+              </div>
+
+            </div>
 
             {/* CONTENT */}
 
@@ -777,63 +694,45 @@ export default function App() {
 
               <p
                 style={{
-                  color:
-                    "#60a5fa"
+                  color: "#60a5fa"
                 }}
               >
-                {
-                  selectedProduct.category
-                }
+                {selectedProduct.category}
               </p>
 
               <h2
                 style={{
-                  fontSize:
-                    "42px",
-                  lineHeight:
-                    "1.3",
-                  marginTop:
-                    "10px"
+                  fontSize: "42px",
+                  lineHeight: "1.3",
+                  marginTop: "10px"
                 }}
               >
-                {
-                  selectedProduct.title
-                }
+                {selectedProduct.title}
               </h2>
 
               <div
                 style={{
-                  display:
-                    "flex",
+                  display: "flex",
                   gap: "15px",
-                  alignItems:
-                    "center",
-                  marginTop:
-                    "20px"
+                  alignItems: "center",
+                  marginTop: "20px"
                 }}
               >
 
                 <span
                   style={{
-                    color:
-                      "#22c55e",
-                    fontSize:
-                      "34px",
-                    fontWeight:
-                      "800"
+                    color: "#22c55e",
+                    fontSize: "34px",
+                    fontWeight: "800"
                   }}
                 >
-                  {
-                    selectedProduct.sellingPrice
-                  }
+                  {selectedProduct.sellingPrice}
                 </span>
 
                 <span
                   style={{
-                    color:
-                      "#94a3b8",
-                    textDecoration:
-                      "line-through"
+                    color: "#94a3b8",
+                    textDecoration: "line-through"
                   }}
                 >
                   ₹
@@ -849,111 +748,44 @@ export default function App() {
 
               </div>
 
+              {/* DESCRIPTION */}
+
               <p
                 style={{
-                  marginTop:
-                    "25px",
-                  color:
-                    "#cbd5e1",
-                  lineHeight:
-                    "1.9"
+                  marginTop: "25px",
+                  color: "#cbd5e1",
+                  lineHeight: "1.9"
                 }}
               >
-                {
-                  selectedProduct.description
-                }
+                {selectedProduct.description}
               </p>
-
-              {/* IMAGES */}
-
-              <div
-                style={{
-                  display:
-                    "grid",
-                  gridTemplateColumns:
-                    "repeat(auto-fit,minmax(90px,1fr))",
-                  gap: "12px",
-                  marginTop:
-                    "30px"
-                }}
-              >
-
-                {selectedProduct.images?.map(
-                  (img, i) => (
-
-                    <img
-                      key={i}
-                      src={img}
-                      alt=""
-                      onClick={() =>
-                        setSelectedProduct({
-                          ...selectedProduct,
-                          previewImage:
-                            img
-                        })
-                      }
-                      style={{
-                        width:
-                          "100%",
-                        height:
-                          "90px",
-                        objectFit:
-                          "cover",
-                        borderRadius:
-                          "12px",
-                        cursor:
-                          "pointer",
-                        border:
-                          selectedProduct.previewImage ===
-                          img
-                            ? "3px solid #2563eb"
-                            : "2px solid transparent"
-                      }}
-                    />
-
-                  )
-                )}
-
-              </div>
 
               {/* BUTTONS */}
 
               <div
                 style={{
-                  display:
-                    "flex",
+                  display: "flex",
                   gap: "15px",
-                  marginTop:
-                    "30px",
-                  flexWrap:
-                    "wrap"
+                  marginTop: "30px",
+                  flexWrap: "wrap"
                 }}
               >
 
                 <button
                   onClick={() =>
-                    addToCart(
-                      selectedProduct
-                    )
+                    addToCart(selectedProduct)
                   }
                   style={{
                     flex: 1,
-                    minWidth:
-                      "220px",
-                    padding:
-                      "16px",
-                    border:
-                      "none",
-                    borderRadius:
-                      "14px",
+                    minWidth: "220px",
+                    padding: "16px",
+                    border: "none",
+                    borderRadius: "14px",
                     background:
                       "linear-gradient(135deg,#2563eb,#7c3aed)",
-                    color:
-                      "#fff",
-                    fontWeight:
-                      "700",
-                    cursor:
-                      "pointer"
+                    color: "#fff",
+                    fontWeight: "700",
+                    cursor: "pointer"
                   }}
                 >
                   Add To Cart
@@ -962,22 +794,15 @@ export default function App() {
                 <button
                   style={{
                     flex: 1,
-                    minWidth:
-                      "220px",
-                    padding:
-                      "16px",
-                    border:
-                      "none",
-                    borderRadius:
-                      "14px",
+                    minWidth: "220px",
+                    padding: "16px",
+                    border: "none",
+                    borderRadius: "14px",
                     background:
                       "linear-gradient(135deg,#22c55e,#16a34a)",
-                    color:
-                      "#fff",
-                    fontWeight:
-                      "700",
-                    cursor:
-                      "pointer"
+                    color: "#fff",
+                    fontWeight: "700",
+                    cursor: "pointer"
                   }}
                 >
                   Buy Now
@@ -1006,11 +831,9 @@ export default function App() {
           width: "400px",
           maxWidth: "100%",
           height: "100%",
-          background:
-            "#0f172a",
+          background: "#0f172a",
           zIndex: 99999,
-          transition:
-            "0.3s",
+          transition: "0.3s",
           padding: "25px",
           overflowY: "auto"
         }}
@@ -1019,32 +842,23 @@ export default function App() {
         <div
           style={{
             display: "flex",
-            justifyContent:
-              "space-between",
-            alignItems:
-              "center"
+            justifyContent: "space-between",
+            alignItems: "center"
           }}
         >
 
-          <h2>
-            🛒 Your Cart
-          </h2>
+          <h2>🛒 Your Cart</h2>
 
           <button
             onClick={() =>
               setCartOpen(false)
             }
             style={{
-              background:
-                "transparent",
-              border:
-                "none",
-              color:
-                "#fff",
-              fontSize:
-                "22px",
-              cursor:
-                "pointer"
+              background: "transparent",
+              border: "none",
+              color: "#fff",
+              fontSize: "22px",
+              cursor: "pointer"
             }}
           >
             ✕
@@ -1063,33 +877,23 @@ export default function App() {
             <div
               key={i}
               style={{
-                display:
-                  "flex",
+                display: "flex",
                 gap: "12px",
-                background:
-                  "#111827",
-                padding:
-                  "12px",
-                borderRadius:
-                  "16px",
-                marginBottom:
-                  "18px"
+                background: "#111827",
+                padding: "12px",
+                borderRadius: "16px",
+                marginBottom: "18px"
               }}
             >
 
               <img
-                src={
-                  item.images?.[0]
-                }
+                src={item.images?.[0]}
                 alt=""
                 style={{
                   width: "90px",
-                  height:
-                    "90px",
-                  objectFit:
-                    "cover",
-                  borderRadius:
-                    "12px"
+                  height: "90px",
+                  objectFit: "cover",
+                  borderRadius: "12px"
                 }}
               />
 
@@ -1101,8 +905,7 @@ export default function App() {
 
                 <h4
                   style={{
-                    lineHeight:
-                      "1.5"
+                    lineHeight: "1.5"
                   }}
                 >
                   {item.title}
@@ -1110,48 +913,35 @@ export default function App() {
 
                 <p
                   style={{
-                    color:
-                      "#22c55e",
-                    marginTop:
-                      "10px"
+                    color: "#22c55e",
+                    marginTop: "10px"
                   }}
                 >
-                  {
-                    item.sellingPrice
-                  }
+                  {item.sellingPrice}
                 </p>
 
                 <div
                   style={{
-                    display:
-                      "flex",
-                    alignItems:
-                      "center",
+                    display: "flex",
                     gap: "10px",
-                    marginTop:
-                      "10px"
+                    alignItems: "center",
+                    marginTop: "10px"
                   }}
                 >
 
                   <button
                     onClick={() =>
-                      decreaseQty(
-                        item.id
-                      )
+                      decreaseQty(item.id)
                     }
                   >
                     -
                   </button>
 
-                  <span>
-                    {item.qty}
-                  </span>
+                  <span>{item.qty}</span>
 
                   <button
                     onClick={() =>
-                      increaseQty(
-                        item.id
-                      )
+                      increaseQty(item.id)
                     }
                   >
                     +
@@ -1172,35 +962,26 @@ export default function App() {
             marginTop: "25px",
             borderTop:
               "1px solid rgba(255,255,255,0.08)",
-            paddingTop:
-              "20px"
+            paddingTop: "20px"
           }}
         >
 
           <h2>
-            Total: ₹
-            {totalPrice}
+            Total: ₹{totalPrice}
           </h2>
 
           <button
             style={{
               width: "100%",
-              marginTop:
-                "18px",
-              padding:
-                "16px",
-              border:
-                "none",
-              borderRadius:
-                "14px",
+              marginTop: "18px",
+              padding: "16px",
+              border: "none",
+              borderRadius: "14px",
               background:
                 "linear-gradient(135deg,#2563eb,#7c3aed)",
-              color:
-                "#fff",
-              fontWeight:
-                "700",
-              cursor:
-                "pointer"
+              color: "#fff",
+              fontWeight: "700",
+              cursor: "pointer"
             }}
           >
             Checkout
@@ -1209,155 +990,6 @@ export default function App() {
         </div>
 
       </div>
-
-      {/* FOOTER */}
-
-      <footer
-        style={{
-          background:
-            "#01040f",
-          padding:
-            "60px 25px",
-          borderTop:
-            "1px solid rgba(255,255,255,0.08)"
-        }}
-      >
-
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns:
-              "repeat(auto-fit,minmax(250px,1fr))",
-            gap: "40px"
-          }}
-        >
-
-          <div>
-
-            <h2
-              style={{
-                fontSize: "32px"
-              }}
-            >
-              OmniSphere
-            </h2>
-
-            <p
-              style={{
-                marginTop:
-                  "18px",
-                color:
-                  "#94a3b8",
-                lineHeight:
-                  "1.8"
-              }}
-            >
-              Premium ecommerce
-              experience with
-              trending viral
-              products.
-            </p>
-
-          </div>
-
-          <div>
-
-            <h3>Quick Links</h3>
-
-            <p
-              style={{
-                marginTop:
-                  "16px",
-                color:
-                  "#94a3b8"
-              }}
-            >
-              Home
-            </p>
-
-            <p
-              style={{
-                marginTop:
-                  "12px",
-                color:
-                  "#94a3b8"
-              }}
-            >
-              Products
-            </p>
-
-            <p
-              style={{
-                marginTop:
-                  "12px",
-                color:
-                  "#94a3b8"
-              }}
-            >
-              Categories
-            </p>
-
-          </div>
-
-          <div>
-
-            <h3>Support</h3>
-
-            <p
-              style={{
-                marginTop:
-                  "16px",
-                color:
-                  "#94a3b8"
-              }}
-            >
-              Contact Us
-            </p>
-
-            <p
-              style={{
-                marginTop:
-                  "12px",
-                color:
-                  "#94a3b8"
-              }}
-            >
-              Returns
-            </p>
-
-            <p
-              style={{
-                marginTop:
-                  "12px",
-                color:
-                  "#94a3b8"
-              }}
-            >
-              Shipping
-            </p>
-
-          </div>
-
-        </div>
-
-        <div
-          style={{
-            marginTop: "50px",
-            borderTop:
-              "1px solid rgba(255,255,255,0.08)",
-            paddingTop:
-              "25px",
-            textAlign:
-              "center",
-            color:
-              "#94a3b8"
-          }}
-        >
-          © 2026 OmniSphere.
-          All rights reserved.
-        </div>
-
-      </footer>
 
       {/* WHATSAPP */}
 
@@ -1371,18 +1003,13 @@ export default function App() {
           bottom: "20px",
           width: "65px",
           height: "65px",
-          borderRadius:
-            "50%",
-          background:
-            "#22c55e",
+          borderRadius: "50%",
+          background: "#22c55e",
           display: "flex",
-          justifyContent:
-            "center",
-          alignItems:
-            "center",
+          justifyContent: "center",
+          alignItems: "center",
           fontSize: "32px",
-          textDecoration:
-            "none",
+          textDecoration: "none",
           zIndex: 99999
         }}
       >
